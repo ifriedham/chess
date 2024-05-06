@@ -48,4 +48,8 @@ public class ChessMove {
                 + "} -> {"
                 + endPosition.getRow() + ", " + endPosition.getColumn() + "}";
     }
+
+
+
+
 }

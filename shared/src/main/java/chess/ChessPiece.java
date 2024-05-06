@@ -139,4 +139,15 @@ public class ChessPiece {
 
         return new int[0][];
     }
+
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
+    }
 }

@@ -7,14 +7,13 @@ package chess;
  * signature of the existing methods.
  */
 public class ChessPosition {
-
     private final int row;
     private final int col;
 
     public ChessPosition(int row, int col) {
-        /* '-1' added to convert from 1-8 -> 0-7 squares on the board*/
-        this.row = row - 1;
-        this.col = col - 1;
+
+        this.row = row;
+        this.col = col;
     }
 
     /**
@@ -31,5 +30,15 @@ public class ChessPosition {
      */
     public int getColumn() {
         return col;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 }
