@@ -46,9 +46,16 @@ public class ChessMove {
 
     @Override
     public String toString() {
-        return "{" + startPosition.getRow() + ", " + startPosition.getColumn()
-                + "} -> {"
-                + endPosition.getRow() + ", " + endPosition.getColumn() + "}";
+        if (promotionPiece != null){
+            return "{" + startPosition.getRow() + ", " + startPosition.getColumn()
+                    + "} -> {"
+                    + endPosition.getRow() + ", " + endPosition.getColumn() + "} (pawn->"
+                    + promotionPiece + ")";
+        } else{
+            return "{" + startPosition.getRow() + ", " + startPosition.getColumn()
+                    + "} -> {"
+                    + endPosition.getRow() + ", " + endPosition.getColumn() + "}";
+        }
     }
 
     @Override

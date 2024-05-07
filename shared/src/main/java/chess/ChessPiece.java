@@ -77,12 +77,8 @@ public class ChessPiece {
                         ChessMove extraMove = null;
                         if (newMove != null){
                             switch (pieceColor){
-                                case WHITE -> {
-                                    extraMove = getPawnMove(board, myPosition, direction[0] + 1, direction[1]);
-                                }
-                                case BLACK -> {
-                                    extraMove = getPawnMove(board, myPosition, direction[0] - 1, direction[1]);
-                                }
+                                case WHITE -> extraMove = getPawnMove(board, myPosition, direction[0] + 1, direction[1]);
+                                case BLACK -> extraMove = getPawnMove(board, myPosition, direction[0] - 1, direction[1]);
                             }
                         }
                         if (newMove != null) moves.add(newMove);
@@ -167,17 +163,14 @@ public class ChessPiece {
     }
 
     private boolean isOccupied (ChessBoard board, ChessPosition nextPos){
-        if (board.getPiece(nextPos) != null) return true;  // spot is occupied
-        else return false;  // Spot is empty
+        return board.getPiece(nextPos) != null;
     }
 
     private boolean isOutOfBounds (ChessPosition position){
-        if (position.getRow() <= 0
+        return position.getRow() <= 0
                 || position.getRow() > 8
                 || position.getColumn() <= 0
-                || position.getColumn() > 8)
-            return true;  // next position is out of bounds
-        else return false;  // next position is within bounds
+                || position.getColumn() > 8;
     }
 
     private Collection<ChessMove> getLinearMoves(ChessBoard board, ChessPosition myPosition, int verticalDir, int horizontalDir) {
