@@ -62,7 +62,8 @@ public class ChessPiece {
             case KING, KNIGHT -> { // both move to a single spot
                 int[][] directions = getDirections(this.type);
                 for (int[] direction : directions) {
-                    moves.add(getSingleMoves(board, myPosition, direction[0], direction[1]));
+                    ChessMove newMove = getSingleMoves(board, myPosition, direction[0], direction[1]);
+                    if (newMove != null) moves.add(newMove);
                 }
             }
 
