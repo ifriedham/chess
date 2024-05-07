@@ -62,7 +62,7 @@ public class ChessPiece {
             case KING, KNIGHT -> { // both move to a single spot
                 int[][] directions = getDirections(this.type);
                 for (int[] direction : directions) {
-                    ChessMove newMove = getSingleMoves(board, myPosition, direction[0], direction[1]);
+                    ChessMove newMove = getSingleMove(board, myPosition, direction[0], direction[1]);
                     if (newMove != null) moves.add(newMove);
                 }
             }
@@ -70,8 +70,33 @@ public class ChessPiece {
             case PAWN -> { // all sorts of crazy
                 int[][] directions = getDirections(this.type);
                 for (int[] direction : directions) {
-                    ChessMove newMove = getPawnMoves(board, myPosition, direction[0], direction[1]);
-                    if (newMove != null) moves.add(newMove);
+                    ChessPosition newPos = new ChessPosition(myPosition.getRow() + direction[0], myPosition.getColumn() + direction[1]);
+
+                    // diagonal + occupied by enemy
+                    if ((direction[1] != 0) && isOccupied(board, newPos)){
+                        ChessMove newMove = getSingleMove(board, myPosition, direction[0], direction[1]);
+                        if (newMove != null) moves.add(newMove);
+                    }
+
+                    // Straight forward move
+                    else {
+                        ChessMove newMove = getPawnMove(board, myPosition, direction[0], direction[1]);
+                        if (newMove != null) {
+                            moves.add(newMove);
+                            if (isFirstMove(this.getTeamColor(), myPosition)){
+                                switch (this.getTeamColor()){
+                                    case WHITE -> {
+                                        ChessMove extraMove = getPawnMove(board, myPosition, 2, 0);
+                                        if (extraMove != null) moves.add(extraMove);
+                                    }
+                                    case BLACK -> {
+                                        ChessMove extraMove = getPawnMove(board, myPosition, -2, 0);
+                                        if (extraMove != null) moves.add(extraMove);
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
 
             }
@@ -79,6 +104,7 @@ public class ChessPiece {
 
         return moves;
     }
+
 
 
 
@@ -181,7 +207,7 @@ public class ChessPiece {
         return possibleMoves;
     }
 
-    private ChessMove getSingleMoves(ChessBoard board, ChessPosition myPosition, int horizontalDir, int verticalDir) {
+    private ChessMove getSingleMove(ChessBoard board, ChessPosition myPosition, int horizontalDir, int verticalDir) {
         int nextRow = myPosition.getRow() + horizontalDir;
         int nextCol = myPosition.getColumn() + verticalDir;
         ChessPosition nextPos = new ChessPosition(nextRow, nextCol);
@@ -194,8 +220,26 @@ public class ChessPiece {
         } else return new ChessMove(myPosition, nextPos, null);
     }
 
-    private ChessMove getPawnMoves(ChessBoard board, ChessPosition myPosition, int horizontalDir, int verticalDir) {
+    private ChessMove getPawnMove(ChessBoard board, ChessPosition myPosition, int horizontalDir, int verticalDir) {
+        int nextRow = myPosition.getRow() + horizontalDir;
+        int nextCol = myPosition.getColumn() + verticalDir;
+        ChessPosition nextPos = new ChessPosition(nextRow, nextCol);
 
+        if (isOutOfBounds(nextPos)) return null;
+        if (isOccupied(board, nextPos)) return null;
+        else return new ChessMove(myPosition, nextPos, null);
+    }
+
+    private boolean isFirstMove(ChessGame.TeamColor teamColor, ChessPosition myPosition) {
+        switch (teamColor){
+            case WHITE -> {
+                if (myPosition.getRow() == 2)return true;
+            }
+            case BLACK -> {
+                if (myPosition.getRow() == 7)return true;
+            }
+        }
+        return false;
     }
 
     @Override
