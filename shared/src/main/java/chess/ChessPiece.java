@@ -51,16 +51,16 @@ public class ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> moves = new ArrayList<>();
 
-        switch (this.type) {
+        switch (type) {
             case QUEEN, BISHOP, ROOK -> {  // all move in a straight line
-                int[][] directions = getDirections(this.type);
+                int[][] directions = getDirections(type);
                 for (int[] direction : directions) {
                     moves.addAll(getLinearMoves(board, myPosition, direction[0], direction[1]));
                 }
             }
 
             case KING, KNIGHT -> { // both move to a single spot
-                int[][] directions = getDirections(this.type);
+                int[][] directions = getDirections(type);
                 for (int[] direction : directions) {
                     ChessMove newMove = getSingleMove(board, myPosition, direction[0], direction[1]);
                     if (newMove != null) moves.add(newMove);
@@ -68,40 +68,34 @@ public class ChessPiece {
             }
 
             case PAWN -> { // all sorts of crazy
-                int[][] directions = getDirections(this.type);
+                int[][] directions = getDirections(type);
                 for (int[] direction : directions) {
-                    ChessPosition newPos = new ChessPosition(myPosition.getRow() + direction[0], myPosition.getColumn() + direction[1]);
+                    if ((direction[1] == 0) && isFirstMove(pieceColor, myPosition)){
 
-                    // diagonal + occupied by enemy
-                    if ((direction[1] != 0) && isOccupied(board, newPos)){
-                        ChessMove newMove = getSingleMove(board, myPosition, direction[0], direction[1]);
-                        if (newMove != null) moves.add(newMove);
                     }
 
-                    // Straight forward move
-                    else {
-                        ChessMove newMove = getPawnMove(board, myPosition, direction[0], direction[1]);
-                        if (newMove != null) {
-                            moves.add(newMove);
-                            if (isFirstMove(this.getTeamColor(), myPosition)){
-                                switch (this.getTeamColor()){
-                                    case WHITE -> {
-                                        ChessMove extraMove = getPawnMove(board, myPosition, 2, 0);
-                                        if (extraMove != null) moves.add(extraMove);
-                                    }
-                                    case BLACK -> {
-                                        ChessMove extraMove = getPawnMove(board, myPosition, -2, 0);
-                                        if (extraMove != null) moves.add(extraMove);
-                                    }
+
+
+
+                    ChessMove newMove = getPawnMove(board, myPosition, direction[0], direction[1]);
+                    if (newMove != null) {
+                        moves.add(newMove);
+                        if (isFirstMove(this.getTeamColor(), myPosition)){
+                            switch (this.getTeamColor()){
+                                case WHITE -> {
+                                    ChessMove extraMove = getPawnMove(board, myPosition, 2, 0);
+                                    if (extraMove != null) moves.add(extraMove);
+                                }
+                                case BLACK -> {
+                                    ChessMove extraMove = getPawnMove(board, myPosition, -2, 0);
+                                    if (extraMove != null) moves.add(extraMove);
                                 }
                             }
                         }
                     }
                 }
-
             }
         }
-
         return moves;
     }
 
@@ -162,9 +156,9 @@ public class ChessPiece {
                     }
                     case BLACK -> {
                         return new int [][]{
-                                {-1, -1},  // North West
-                                {-1, 0},   // North
-                                {-1, 1},   // North East
+                                {-1, -1},  // South West
+                                {-1, 0},   // South
+                                {-1, 1},   // South East
                         };
                     }
                 }
@@ -224,10 +218,21 @@ public class ChessPiece {
         int nextRow = myPosition.getRow() + horizontalDir;
         int nextCol = myPosition.getColumn() + verticalDir;
         ChessPosition nextPos = new ChessPosition(nextRow, nextCol);
+        boolean occupied = isOccupied(board, nextPos);
 
         if (isOutOfBounds(nextPos)) return null;
-        if (isOccupied(board, nextPos)) return null;
-        else return new ChessMove(myPosition, nextPos, null);
+
+        // diagonal move
+        if (horizontalDir != 0){
+            if (occupied) return new ChessMove(myPosition, nextPos, null);
+        }
+
+        // straight forward
+        if (horizontalDir == 0) {
+            if (!occupied) return new ChessMove(myPosition, nextPos, null);
+        }
+
+        return null;
     }
 
     private boolean isFirstMove(ChessGame.TeamColor teamColor, ChessPosition myPosition) {
