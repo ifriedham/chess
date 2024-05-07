@@ -72,6 +72,7 @@ public class ChessPiece {
                 for (int[] direction : directions) {
                     ChessMove newMove = null;
 
+                    // first move
                     if ((direction[1] == 0) && isFirstMove(pieceColor, myPosition)){
                         newMove = getPawnMove(board, myPosition, direction[0], direction[1]);
                         ChessMove extraMove = null;
@@ -86,14 +87,38 @@ public class ChessPiece {
                     }
 
                     newMove = getPawnMove(board, myPosition, direction[0], direction[1]);
-                    if (newMove != null) moves.add(newMove);
+
+                    if (newMove != null){
+                        if (canPromote(newMove, pieceColor)) {
+                            moves.addAll(getPawnPromotions(newMove));
+                        } else moves.add(newMove);
+                    }
                 }
             }
         }
         return moves;
     }
 
+    private Collection<ChessMove> getPawnPromotions(ChessMove newMove) {
+        ArrayList<ChessMove> promotions = new ArrayList<>();
+        promotions.add(new ChessMove(newMove.getStartPosition(), newMove.getEndPosition(), PieceType.QUEEN));
+        promotions.add(new ChessMove(newMove.getStartPosition(), newMove.getEndPosition(), PieceType.ROOK));
+        promotions.add(new ChessMove(newMove.getStartPosition(), newMove.getEndPosition(), PieceType.KNIGHT));
+        promotions.add(new ChessMove(newMove.getStartPosition(), newMove.getEndPosition(), PieceType.BISHOP));
+        return promotions;
+    }
 
+    private boolean canPromote(ChessMove newMove, ChessGame.TeamColor pieceColor) {
+        switch(pieceColor){
+            case WHITE -> {
+                if (newMove.getEndPosition().getRow() == 8) return true;
+            }
+            case BLACK -> {
+                if (newMove.getEndPosition().getRow() == 1) return true;
+            }
+        }
+        return false;
+    }
 
 
     private int[][] getDirections(PieceType type) {
