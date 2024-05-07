@@ -99,26 +99,7 @@ public class ChessPiece {
         return moves;
     }
 
-    private Collection<ChessMove> getPawnPromotions(ChessMove newMove) {
-        ArrayList<ChessMove> promotions = new ArrayList<>();
-        promotions.add(new ChessMove(newMove.getStartPosition(), newMove.getEndPosition(), PieceType.QUEEN));
-        promotions.add(new ChessMove(newMove.getStartPosition(), newMove.getEndPosition(), PieceType.ROOK));
-        promotions.add(new ChessMove(newMove.getStartPosition(), newMove.getEndPosition(), PieceType.KNIGHT));
-        promotions.add(new ChessMove(newMove.getStartPosition(), newMove.getEndPosition(), PieceType.BISHOP));
-        return promotions;
-    }
 
-    private boolean canPromote(ChessMove newMove, ChessGame.TeamColor pieceColor) {
-        switch(pieceColor){
-            case WHITE -> {
-                if (newMove.getEndPosition().getRow() == 8) return true;
-            }
-            case BLACK -> {
-                if (newMove.getEndPosition().getRow() == 1) return true;
-            }
-        }
-        return false;
-    }
 
 
     private int[][] getDirections(PieceType type) {
@@ -240,7 +221,9 @@ public class ChessPiece {
 
         // diagonal move
         if (horizontalDir != 0){
-            if (occupied) return new ChessMove(myPosition, nextPos, null);
+            if (occupied && (board.getPiece(nextPos).getTeamColor() != this.getTeamColor())) { // space is occupied by enemy
+                return new ChessMove(myPosition, nextPos, null);
+            }
         }
 
         // straight forward
@@ -258,6 +241,27 @@ public class ChessPiece {
             }
             case BLACK -> {
                 if (myPosition.getRow() == 7)return true;
+            }
+        }
+        return false;
+    }
+
+    private Collection<ChessMove> getPawnPromotions(ChessMove newMove) {
+        ArrayList<ChessMove> promotions = new ArrayList<>();
+        promotions.add(new ChessMove(newMove.getStartPosition(), newMove.getEndPosition(), PieceType.QUEEN));
+        promotions.add(new ChessMove(newMove.getStartPosition(), newMove.getEndPosition(), PieceType.ROOK));
+        promotions.add(new ChessMove(newMove.getStartPosition(), newMove.getEndPosition(), PieceType.KNIGHT));
+        promotions.add(new ChessMove(newMove.getStartPosition(), newMove.getEndPosition(), PieceType.BISHOP));
+        return promotions;
+    }
+
+    private boolean canPromote(ChessMove newMove, ChessGame.TeamColor pieceColor) {
+        switch(pieceColor){
+            case WHITE -> {
+                if (newMove.getEndPosition().getRow() == 8) return true;
+            }
+            case BLACK -> {
+                if (newMove.getEndPosition().getRow() == 1) return true;
             }
         }
         return false;
