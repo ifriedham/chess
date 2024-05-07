@@ -2,6 +2,7 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * Represents a single chess piece
@@ -54,8 +55,6 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> moves = new ArrayList<>();
-        int[][] directions = getDirections(this.type);
-        int i = 0;
 
         switch (this.type) {
             case KING -> {
@@ -67,6 +66,7 @@ public class ChessPiece {
             }
 
             case BISHOP -> {
+                int[][] directions = getDirections(this.type);
                 for (int[] direction : directions) {
                     moves.addAll(getLinearMoves(board, myPosition, direction[0], direction[1]));
                 }
@@ -101,17 +101,15 @@ public class ChessPiece {
             if (nextSpot == null) {  // spot is empty, add to list
                 possibleMoves.add(new ChessMove(myPosition, new ChessPosition(nextRow, nextCol), null));
             } else { // spot is occupied by an...
-                // ally
-                if (nextSpot.getTeamColor() == this.getTeamColor()) break;
-
-                    // enemy
-                else {
+                // enemy
+                if (nextSpot.getTeamColor() != this.getTeamColor()){
                     possibleMoves.add(new ChessMove(myPosition, new ChessPosition(nextRow, nextCol), null));
                     break;
                 }
+                // ally
+                else break;
             }
         }
-
         return possibleMoves;
     }
 
@@ -140,14 +138,16 @@ public class ChessPiece {
         return new int[0][];
     }
 
-
     @Override
-    public int hashCode() {
-        return super.hashCode();
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessPiece piece = (ChessPiece) o;
+        return pieceColor == piece.pieceColor && type == piece.type;
     }
 
     @Override
-    public boolean equals(Object obj) {
-        return super.equals(obj);
+    public int hashCode() {
+        return Objects.hash(pieceColor, type);
     }
 }
