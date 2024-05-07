@@ -119,6 +119,22 @@ public class ChessPiece {
                 };
             }
             case PAWN -> {
+                switch (this.getTeamColor()){
+                    case WHITE -> {
+                        return new int [][]{
+                                {1, -1}, // North West
+                                {1, 0},  // North
+                                {1, 1},  // North East
+                        };
+                    }
+                    case BLACK -> {
+                        return new int [][]{
+                                {-1, -1},  // North West
+                                {-1, 0},   // North
+                                {-1, 1},   // North East
+                        };
+                    }
+                }
             }
         }
 
