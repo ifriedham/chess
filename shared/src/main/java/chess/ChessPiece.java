@@ -68,12 +68,19 @@ public class ChessPiece {
             }
 
             case PAWN -> { // all sorts of crazy
+                int[][] directions = getDirections(this.type);
+                for (int[] direction : directions) {
+                    ChessMove newMove = getPawnMoves(board, myPosition, direction[0], direction[1]);
+                    if (newMove != null) moves.add(newMove);
+                }
 
             }
         }
 
         return moves;
     }
+
+
 
     private int[][] getDirections(PieceType type) {
         switch (type) {
@@ -185,6 +192,10 @@ public class ChessPiece {
                 return new ChessMove(myPosition, nextPos, null);
             } else return null;
         } else return new ChessMove(myPosition, nextPos, null);
+    }
+
+    private ChessMove getPawnMoves(ChessBoard board, ChessPosition myPosition, int horizontalDir, int verticalDir) {
+
     }
 
     @Override
