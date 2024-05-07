@@ -70,29 +70,27 @@ public class ChessPiece {
             case PAWN -> { // all sorts of crazy
                 int[][] directions = getDirections(type);
                 for (int[] direction : directions) {
+                    ChessMove newMove = null;
+
                     if ((direction[1] == 0) && isFirstMove(pieceColor, myPosition)){
-
-                    }
-
-
-
-
-                    ChessMove newMove = getPawnMove(board, myPosition, direction[0], direction[1]);
-                    if (newMove != null) {
-                        moves.add(newMove);
-                        if (isFirstMove(this.getTeamColor(), myPosition)){
-                            switch (this.getTeamColor()){
+                        newMove = getPawnMove(board, myPosition, direction[0], direction[1]);
+                        ChessMove extraMove = null;
+                        if (newMove != null){
+                            switch (pieceColor){
                                 case WHITE -> {
-                                    ChessMove extraMove = getPawnMove(board, myPosition, 2, 0);
-                                    if (extraMove != null) moves.add(extraMove);
+                                    extraMove = getPawnMove(board, myPosition, direction[0] + 1, direction[1]);
                                 }
                                 case BLACK -> {
-                                    ChessMove extraMove = getPawnMove(board, myPosition, -2, 0);
-                                    if (extraMove != null) moves.add(extraMove);
+                                    extraMove = getPawnMove(board, myPosition, direction[0] - 1, direction[1]);
                                 }
                             }
                         }
+                        if (newMove != null) moves.add(newMove);
+                        if (extraMove != null) moves.add(extraMove);
                     }
+
+                    newMove = getPawnMove(board, myPosition, direction[0], direction[1]);
+                    if (newMove != null) moves.add(newMove);
                 }
             }
         }
@@ -182,12 +180,12 @@ public class ChessPiece {
         else return false;  // next position is within bounds
     }
 
-    private Collection<ChessMove> getLinearMoves(ChessBoard board, ChessPosition myPosition, int horizontalDir, int verticalDir) {
+    private Collection<ChessMove> getLinearMoves(ChessBoard board, ChessPosition myPosition, int verticalDir, int horizontalDir) {
         ArrayList<ChessMove> possibleMoves = new ArrayList<>();
 
         for (int i = 1; i < 8; i++) {  // loops through all squares in a straight line (including diagonals?)
-            int nextRow = myPosition.getRow() + (i * horizontalDir);
-            int nextCol = myPosition.getColumn() + (i * verticalDir);
+            int nextRow = myPosition.getRow() + (i * verticalDir);
+            int nextCol = myPosition.getColumn() + (i * horizontalDir);
             ChessPosition nextPos = new ChessPosition(nextRow, nextCol);
 
             if (isOutOfBounds(nextPos)) break; // out of bounds
@@ -201,9 +199,9 @@ public class ChessPiece {
         return possibleMoves;
     }
 
-    private ChessMove getSingleMove(ChessBoard board, ChessPosition myPosition, int horizontalDir, int verticalDir) {
-        int nextRow = myPosition.getRow() + horizontalDir;
-        int nextCol = myPosition.getColumn() + verticalDir;
+    private ChessMove getSingleMove(ChessBoard board, ChessPosition myPosition, int verticalDir, int horizontalDir) {
+        int nextRow = myPosition.getRow() + verticalDir;
+        int nextCol = myPosition.getColumn() + horizontalDir;
         ChessPosition nextPos = new ChessPosition(nextRow, nextCol);
 
         if (isOutOfBounds(nextPos)) return null;
@@ -214,9 +212,9 @@ public class ChessPiece {
         } else return new ChessMove(myPosition, nextPos, null);
     }
 
-    private ChessMove getPawnMove(ChessBoard board, ChessPosition myPosition, int horizontalDir, int verticalDir) {
-        int nextRow = myPosition.getRow() + horizontalDir;
-        int nextCol = myPosition.getColumn() + verticalDir;
+    private ChessMove getPawnMove(ChessBoard board, ChessPosition myPosition, int verticalDir, int horizontalDir) {
+        int nextRow = myPosition.getRow() + verticalDir;
+        int nextCol = myPosition.getColumn() + horizontalDir;
         ChessPosition nextPos = new ChessPosition(nextRow, nextCol);
         boolean occupied = isOccupied(board, nextPos);
 
