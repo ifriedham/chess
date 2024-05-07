@@ -62,7 +62,7 @@ public class ChessPiece {
             case KING, KNIGHT -> { // both move to a single spot
                 int[][] directions = getDirections(this.type);
                 for (int[] direction : directions) {
-                    moves.addAll(getSingleMoves(board, myPosition, direction[0], direction[1]));
+                    moves.add(getSingleMoves(board, myPosition, direction[0], direction[1]));
                 }
             }
 
@@ -152,9 +152,10 @@ public class ChessPiece {
 
             ChessPiece nextSpot = checkPosition(board, new ChessPosition(nextRow, nextCol));
 
-            if (nextSpot != null){
+            if (nextSpot != null){ // next spot is valid, add to list
                 possibleMoves.add(new ChessMove(myPosition, new ChessPosition(nextRow, nextCol), null));
-            } else break;
+            }
+            break;
         }
         return possibleMoves;
     }
@@ -163,13 +164,13 @@ public class ChessPiece {
         int nextRow = myPosition.getRow() + horizontalDir;
         int nextCol = myPosition.getColumn() + verticalDir;
 
-        if (nextRow <= 0 || nextRow > 8 || nextCol <= 0 || nextCol > 8) return null;  // next pos. invalid
+        if (isOutOfBounds(nextRow, nextCol)) return null;
 
-        ChessPosition nextPos = new ChessPosition(nextRow, nextCol);
+        ChessPiece nextSpot = checkPosition(board, new ChessPosition(nextRow, nextCol));
 
-        // call new function here
-
-        return new ChessMove(myPosition, nextPos, null);
+        if (nextSpot != null){ // next spot is valid, add to list
+            return new ChessMove(myPosition, new ChessPosition(nextRow, nextCol), null);
+        }
     }
 
     @Override
