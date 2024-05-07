@@ -24,12 +24,7 @@ public class ChessPiece {
      * The various different chess piece options
      */
     public enum PieceType {
-        KING,
-        QUEEN,
-        BISHOP,
-        KNIGHT,
-        ROOK,
-        PAWN
+        KING, QUEEN, BISHOP, KNIGHT, ROOK, PAWN
     }
 
     /**
@@ -57,36 +52,75 @@ public class ChessPiece {
         Collection<ChessMove> moves = new ArrayList<>();
 
         switch (this.type) {
-            case KING -> {
-
-            }
-
-            case QUEEN -> {
-
-            }
-
-            case BISHOP -> {
+            case QUEEN, BISHOP, ROOK -> {  // all move in a straight line
                 int[][] directions = getDirections(this.type);
                 for (int[] direction : directions) {
                     moves.addAll(getLinearMoves(board, myPosition, direction[0], direction[1]));
                 }
             }
 
-            case KNIGHT -> {
+            case KING, KNIGHT -> { // both move to a single spot
 
             }
 
-            case ROOK -> {
-
-            }
-
-            case PAWN -> {
+            case PAWN -> { // all sorts of crazy
 
             }
         }
 
         return moves;
     }
+
+    private int[][] getDirections(PieceType type) {
+        switch (type) {
+            case KING, QUEEN -> {
+                return new int[][]{
+                        {1, 0},   // North
+                        {1, 1},   // North East
+                        {0, 1},   // East
+                        {-1, 1},  // South East
+                        {-1, 0},  // South
+                        {-1, -1}, // South West
+                        {0, -1},  // West
+                        {1, -1}   // North West
+                };
+            }
+            case BISHOP -> {
+                return new int[][]{
+                        {1, 1},   // North East
+                        {-1, 1},  // South East
+                        {-1, -1}, // South West
+                        {1, -1}   // North West
+                };
+            }
+            case KNIGHT -> {
+                return new int[][]{
+                        {2, 1},   // NNE
+                        {1, 2},   // NEE
+                        {-1, 2},  // SEE
+                        {-2, 1},  // SSE
+                        {-2, -1}, // SSW
+                        {-1, -2}, // SWW
+                        {1, -2},  // NWW
+                        {2, -1}   // NNW
+                };
+
+            }
+            case ROOK -> {
+                return new int[][]{
+                        {1, 0},  // North
+                        {0, 1},  // East
+                        {-1, 0}, // South
+                        {0, -1}, // West
+                };
+            }
+            case PAWN -> {
+            }
+        }
+
+        return new int[0][];
+    }
+
 
     private Collection<ChessMove> getLinearMoves(ChessBoard board, ChessPosition myPosition, int horizontalDir, int verticalDir) {
         ArrayList<ChessMove> possibleMoves = new ArrayList<>();
@@ -102,7 +136,7 @@ public class ChessPiece {
                 possibleMoves.add(new ChessMove(myPosition, new ChessPosition(nextRow, nextCol), null));
             } else { // spot is occupied by an...
                 // enemy
-                if (nextSpot.getTeamColor() != this.getTeamColor()){
+                if (nextSpot.getTeamColor() != this.getTeamColor()) {
                     possibleMoves.add(new ChessMove(myPosition, new ChessPosition(nextRow, nextCol), null));
                     break;
                 }
@@ -113,30 +147,6 @@ public class ChessPiece {
         return possibleMoves;
     }
 
-    private int[][] getDirections(PieceType type) {
-        switch (type) {
-            case KING -> {
-            }
-            case QUEEN -> {
-            }
-            case BISHOP -> {
-                return new int[][]{
-                        {1, 1},   // North East
-                        {-1, 1},  // South East
-                        {-1, -1}, // South West
-                        {1, -1}   // North West
-                };
-            }
-            case KNIGHT -> {
-            }
-            case ROOK -> {
-            }
-            case PAWN -> {
-            }
-        }
-
-        return new int[0][];
-    }
 
     @Override
     public boolean equals(Object o) {
