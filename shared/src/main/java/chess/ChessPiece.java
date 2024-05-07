@@ -168,8 +168,8 @@ public class ChessPiece {
     }
 
     private boolean isOutOfBounds(ChessPosition position) {
-        if (position.getRow() < 0 || position.getRow() >= 8) return true;
-        if (position.getColumn() < 0 || position.getColumn() >= 8) return true;
+        if (position.getRow() < 0 || position.getRow() > 7) return true;
+        if (position.getColumn() < 0 || position.getColumn() > 7) return true;
         return false;
     }
 
