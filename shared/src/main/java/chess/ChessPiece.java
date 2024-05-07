@@ -60,7 +60,10 @@ public class ChessPiece {
             }
 
             case KING, KNIGHT -> { // both move to a single spot
-
+                int[][] directions = getDirections(this.type);
+                for (int[] direction : directions) {
+                    moves.addAll(getSingleMoves(board, myPosition, direction[0], direction[1]));
+                }
             }
 
             case PAWN -> { // all sorts of crazy
@@ -121,6 +124,22 @@ public class ChessPiece {
         return new int[0][];
     }
 
+    private ChessPiece checkPosition (ChessBoard board, ChessPosition nextPos){
+        ChessPiece position = board.getPiece(nextPos);
+        if (position == null) {  // Spot is empty --> return valid move
+            return position;
+        }
+        else {  // spot is occupied by an...
+            if (position.getTeamColor() != this.getTeamColor()){  // enemy --> return valid move
+                return position;
+            } else return null;  // ally --> return invalid move (null)
+        }
+    }
+
+    private boolean isOutOfBounds (int row, int col){
+        if (row <= 0 || row > 8 || col <= 0 || col > 8) return true;  // next position is out of bounds
+        else return false;  // next position is within bounds
+    }
 
     private Collection<ChessMove> getLinearMoves(ChessBoard board, ChessPosition myPosition, int horizontalDir, int verticalDir) {
         ArrayList<ChessMove> possibleMoves = new ArrayList<>();
@@ -129,24 +148,29 @@ public class ChessPiece {
             int nextRow = myPosition.getRow() + (i * horizontalDir);
             int nextCol = myPosition.getColumn() + (i * verticalDir);
 
-            if (nextRow <= 0 || nextRow > 8 || nextCol <= 0 || nextCol > 8) break;  // next pos. invalid
+            if (isOutOfBounds(nextRow, nextCol)) break;  // next pos. invalid
 
-            ChessPiece nextSpot = board.getPiece(new ChessPosition(nextRow, nextCol));
-            if (nextSpot == null) {  // spot is empty, add to list
+            ChessPiece nextSpot = checkPosition(board, new ChessPosition(nextRow, nextCol));
+
+            if (nextSpot != null){
                 possibleMoves.add(new ChessMove(myPosition, new ChessPosition(nextRow, nextCol), null));
-            } else { // spot is occupied by an...
-                // enemy
-                if (nextSpot.getTeamColor() != this.getTeamColor()) {
-                    possibleMoves.add(new ChessMove(myPosition, new ChessPosition(nextRow, nextCol), null));
-                    break;
-                }
-                // ally
-                else break;
-            }
+            } else break;
         }
         return possibleMoves;
     }
 
+    private ChessMove getSingleMoves(ChessBoard board, ChessPosition myPosition, int horizontalDir, int verticalDir) {
+        int nextRow = myPosition.getRow() + horizontalDir;
+        int nextCol = myPosition.getColumn() + verticalDir;
+
+        if (nextRow <= 0 || nextRow > 8 || nextCol <= 0 || nextCol > 8) return null;  // next pos. invalid
+
+        ChessPosition nextPos = new ChessPosition(nextRow, nextCol);
+
+        // call new function here
+
+        return new ChessMove(myPosition, nextPos, null);
+    }
 
     @Override
     public boolean equals(Object o) {
