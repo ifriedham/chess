@@ -70,7 +70,7 @@ public class ChessPiece {
             case PAWN -> { // all sorts of crazy
                 int[][] directions = getDirections(type);
                 for (int[] direction : directions) {
-                    ChessMove newMove = null;
+                    ChessMove newMove;
                     newMove = getPawnMove(board, myPosition, direction[0], direction[1]);
 
                     // first move
