@@ -168,16 +168,19 @@ public class ChessPiece {
     }
 
     private boolean isOutOfBounds(ChessPosition position) {
-        if (position.getRow() < 0 || position.getRow() > 7) return true;
-        if (position.getColumn() < 0 || position.getColumn() > 7) return true;
-        return false;
+        if (position.getRow() <= 0
+                || position.getRow() > 8
+                || position.getColumn() <= 0
+                || position.getColumn() > 8)
+            return true;  // next position is out of bounds
+        else return false;  // next position is within bounds
     }
 
 
     private Collection<ChessMove> getLinearMoves(ChessBoard board, ChessPosition myPosition, int verticalDir, int horizontalDir) {
         ArrayList<ChessMove> possibleMoves = new ArrayList<>();
 
-        for (int i = 1; i < 7; i++) {  // loops through all squares in a straight line (including diagonals?)
+        for (int i = 1; i < 8; i++) {  // loops through all squares in a straight line (including diagonals?)
             int nextRow = myPosition.getRow() + (i * verticalDir);
             int nextCol = myPosition.getColumn() + (i * horizontalDir);
             ChessPosition nextPos = new ChessPosition(nextRow, nextCol);
@@ -212,9 +215,11 @@ public class ChessPiece {
         int nextRow = myPosition.getRow() + verticalDir;
         int nextCol = myPosition.getColumn() + horizontalDir;
         ChessPosition nextPos = new ChessPosition(nextRow, nextCol);
-        boolean occupied = isOccupied(board, nextPos);
 
         if (isOutOfBounds(nextPos)) return null;
+        boolean occupied = isOccupied(board, nextPos);
+
+
 
         // diagonal move
         if (horizontalDir != 0){
