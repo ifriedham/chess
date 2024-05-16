@@ -82,7 +82,19 @@ public class ChessGame {
         // if the given move isn't on the list of valid moves (or the list returns null), throw exception
         if (validMoves == null || !validMoves.contains(move)) throw new InvalidMoveException();
 
+        // move piece (copy piece to new spot, set old spot to null)
+        board.addPiece(move.getEndPosition(), board.getPiece(move.getStartPosition()));
+        board.removePiece(move.getStartPosition());
 
+        // add logic for promotion pieces?
+
+        // next turn
+        changeTurn();
+    }
+
+    private void changeTurn() {
+        if (turn == TeamColor.WHITE) turn = TeamColor.BLACK;
+        if (turn == TeamColor.BLACK) turn = TeamColor.WHITE;
     }
 
     /**
