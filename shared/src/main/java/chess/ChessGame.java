@@ -55,12 +55,17 @@ public class ChessGame {
         // invalid move (no piece there, or not your turn)
         if (pieceToMove == null || pieceToMove.getTeamColor() != getTeamTurn()) return null;
 
-        Collection<ChessMove> moves = null;
+        // get list of all standard moves, regardless of King's safety
+        Collection<ChessMove> allMoves = pieceToMove.pieceMoves(board, startPosition);
 
-        // standard pieces (not kings)
-        moves = pieceToMove.pieceMoves(board, startPosition);
+        Collection<ChessMove> validMoves = null;
+        for (ChessMove move : allMoves){  // Check all possible moves -> do they put the current team in check?
+            if (!isInCheck(pieceToMove.getTeamColor())){  // if not, add them to the list of valid moves
+                validMoves.add(move);
+            }
+        }
 
-        return moves;
+        return validMoves;
     }
 
 
