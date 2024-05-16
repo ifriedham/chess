@@ -68,7 +68,6 @@ public class ChessGame {
         return validMoves;
     }
 
-
     /**
      * Makes a move in a chess game
      *
@@ -77,6 +76,11 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
 
+        // get list of valid moves for piece
+        Collection<ChessMove> validMoves = validMoves(move.getStartPosition());
+
+        // if the given move isn't on the list of valid moves (or the list returns null), throw exception
+        if (validMoves == null || !validMoves.contains(move)) throw new InvalidMoveException();
 
         throw new RuntimeException("Not implemented");
     }
