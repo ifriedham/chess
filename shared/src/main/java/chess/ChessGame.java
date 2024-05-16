@@ -82,7 +82,7 @@ public class ChessGame {
         // if the given move isn't on the list of valid moves (or the list returns null), throw exception
         if (validMoves == null || !validMoves.contains(move)) throw new InvalidMoveException();
 
-        throw new RuntimeException("Not implemented");
+
     }
 
     /**
