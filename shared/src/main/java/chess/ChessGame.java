@@ -104,6 +104,8 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
+        ChessPosition kingPosition = board.findKing(new ChessPiece(teamColor, ChessPiece.PieceType.KING));
+
 
 
         throw new RuntimeException("Not implemented");

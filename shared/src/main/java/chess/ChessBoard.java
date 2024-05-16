@@ -47,8 +47,8 @@ public class ChessBoard {
     }
 
     public ChessPosition findKing(ChessPiece piece) {
-        for (int row = 0; row < 8; row++){
-            for (int col = 0; col <8; col++){
+        for (int row = 1; row <= 8; row++){
+            for (int col = 1; col <= 8; col++){
 
                 ChessPosition position = new ChessPosition(row, col);
 
