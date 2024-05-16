@@ -46,6 +46,22 @@ public class ChessBoard {
         return board[row][col];
     }
 
+    public ChessPosition findKing(ChessPiece piece) {
+        for (int row = 0; row < 8; row++){
+            for (int col = 0; col <8; col++){
+
+                ChessPosition position = new ChessPosition(row, col);
+
+                if (piece == getPiece(position)){
+                    return position;
+                }
+            }
+        }
+
+        // piece not found
+        return null;
+    }
+
     /**
      * Sets the board to the default starting board
      * (How the game of chess normally starts)
