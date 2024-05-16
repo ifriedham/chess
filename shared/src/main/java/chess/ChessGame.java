@@ -14,6 +14,7 @@ public class ChessGame {
 
     public ChessGame() {
         board = new ChessBoard();
+        board.resetBoard();
         turn = TeamColor.WHITE;
     }
 
@@ -50,32 +51,18 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece pieceToMove = board.getPiece(startPosition);
+
+        // invalid move (no piece there, or not your turn)
+        if (pieceToMove == null || pieceToMove.getTeamColor() != getTeamTurn()) return null;
+
         Collection<ChessMove> moves = null;
 
-        if (pieceToMove == null) return null;
-        else {
-            if (pieceToMove.getPieceType() == ChessPiece.PieceType.KING) { // Kings get treated differently
-                moves = getKingMoves();
-            }
+        // standard pieces (not kings)
+        moves = pieceToMove.pieceMoves(board, startPosition);
 
-            // standard pieces (not kings)
-            moves = pieceToMove.pieceMoves(board, startPosition);
-
-            return moves;
-        }
+        return moves;
     }
 
-    private Collection<ChessMove> getKingMoves() {
-        // get standard moves
-
-        // check if any of them are equal to any of ALL opponent's moves
-        // To do this, clone the board, move the king to the new position, then check all opponent's moves
-        // make sure to do a deep copy so the original board doesn't get messed up
-        // check oneNote for more details
-
-        // maybe I can use isInCheck here somehow?
-        throw new RuntimeException("Not implemented");
-    }
 
     /**
      * Makes a move in a chess game
