@@ -195,9 +195,11 @@ public class ChessGame {
 
     private boolean simulateMove(ChessMove move) {
         ChessBoard simBoard = cloneBoard(getBoard());
+        TeamColor pieceColor = simBoard.getPiece(move.getStartPosition()).getTeamColor();
+
         movePiece(simBoard, move);
 
-        return isInCheck(getTeamTurn(), simBoard);
+        return isInCheck(pieceColor, simBoard);
     }
 
     private void changeTurn(TeamColor currentTurn) {
