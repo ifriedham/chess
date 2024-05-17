@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -58,9 +59,9 @@ public class ChessGame {
         // get list of all standard moves, regardless of King's safety
         Collection<ChessMove> allMoves = pieceToMove.pieceMoves(board, startPosition);
 
-        Collection<ChessMove> legalMoves = null;
+        Collection<ChessMove> legalMoves = new ArrayList<>();
         for (ChessMove move : allMoves){  // Check all possible moves -> do they put the current team in check?
-            if (!isInCheck(pieceToMove.getTeamColor()) && move != null){  // if not, add them to the list of valid moves
+            if (!isInCheck(pieceToMove.getTeamColor())){  // if not, add them to the list of valid moves
                 legalMoves.add(move);
             }
         }
