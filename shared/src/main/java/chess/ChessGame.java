@@ -57,23 +57,7 @@ public class ChessGame {
         if (pieceToMove == null) return null;
 
         // get list of all standard moves, regardless of King's safety
-        Collection<ChessMove> allMoves = pieceToMove.pieceMoves(getBoard(), startPosition);
-
-        Collection<ChessMove> legalMoves = new ArrayList<>();
-        for (ChessMove move : allMoves){  // Check all possible moves -> do they put the current team in check?
-            if (!simulateMove(move)){
-                legalMoves.add(move);
-            }
-        }
-
-        return legalMoves;
-    }
-
-    private boolean simulateMove(ChessMove move) {
-        ChessBoard simBoard = cloneBoard(getBoard());
-        movePiece(simBoard, move);
-
-        return isInCheck(getTeamTurn(), simBoard);
+        return pieceToMove.pieceMoves(getBoard(), startPosition);
     }
 
     /**
@@ -92,10 +76,13 @@ public class ChessGame {
 //        if (isInCheckmate(turn)) throw new InvalidMoveException("YOU ARE IN CHECKMATE");
 
         // get list of valid moves for piece
-        Collection<ChessMove> validMoves = validMoves(move.getStartPosition());
+        Collection<ChessMove> legalMoves = validMoves(move.getStartPosition());
 
         // if the given move isn't on the list of valid moves (or the list returns null), throw exception
-        if (validMoves == null || !validMoves.contains(move)) throw new InvalidMoveException("invalid move");
+        if (legalMoves == null || !legalMoves.contains(move)) throw new InvalidMoveException("INVALID MOVE");
+
+        // simulate moves to see if they put the king in check
+        if (simulateMove(move)) throw new InvalidMoveException("MOVE LEAVES YOUR KING IN CHECK");
 
         movePiece(getBoard(), move);
 
@@ -204,6 +191,13 @@ public class ChessGame {
             board.addPiece(move.getEndPosition(), board.getPiece(move.getStartPosition()));
             board.removePiece(move.getStartPosition());
         }
+    }
+
+    private boolean simulateMove(ChessMove move) {
+        ChessBoard simBoard = cloneBoard(getBoard());
+        movePiece(simBoard, move);
+
+        return isInCheck(getTeamTurn(), simBoard);
     }
 
     private void changeTurn(TeamColor currentTurn) {
