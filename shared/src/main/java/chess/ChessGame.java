@@ -52,6 +52,7 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece pieceToMove = board.getPiece(startPosition);
+        TeamColor currentTeam = pieceToMove.getTeamColor();
 
         // invalid move (no piece there, or not your turn)
         if (pieceToMove == null || pieceToMove.getTeamColor() != getTeamTurn()) return null;
@@ -84,10 +85,15 @@ public class ChessGame {
         if (validMoves == null || !validMoves.contains(move)) throw new InvalidMoveException();
 
         // move piece (copy piece to new spot, set old spot to null)
-        board.addPiece(move.getEndPosition(), board.getPiece(move.getStartPosition()));
-        board.removePiece(move.getStartPosition());
-
-        // add logic for promotion pieces?
+        if (move.getPromotionPiece() != null) { // promotion needed?
+            ChessPiece promotedPawn = new ChessPiece(getTeamTurn(), move.getPromotionPiece());
+            board.addPiece(move.getEndPosition(), promotedPawn);
+            board.removePiece(move.getStartPosition());
+        }
+        else {
+            board.addPiece(move.getEndPosition(), board.getPiece(move.getStartPosition()));
+            board.removePiece(move.getStartPosition());
+        }
 
         // next turn
         changeTurn();
