@@ -58,14 +58,14 @@ public class ChessGame {
         // get list of all standard moves, regardless of King's safety
         Collection<ChessMove> allMoves = pieceToMove.pieceMoves(board, startPosition);
 
-        Collection<ChessMove> validMoves = null;
+        Collection<ChessMove> legalMoves = null;
         for (ChessMove move : allMoves){  // Check all possible moves -> do they put the current team in check?
-            if (!isInCheck(pieceToMove.getTeamColor())){  // if not, add them to the list of valid moves
-                validMoves.add(move);
+            if (!isInCheck(pieceToMove.getTeamColor()) && move != null){  // if not, add them to the list of valid moves
+                legalMoves.add(move);
             }
         }
 
-        return validMoves;
+        return legalMoves;
     }
 
     /**
@@ -106,9 +106,23 @@ public class ChessGame {
     public boolean isInCheck(TeamColor teamColor) {
         ChessPosition kingPosition = board.findKing(new ChessPiece(teamColor, ChessPiece.PieceType.KING));
 
+        for (int row = 1; row <= 8; row++){
+            for (int col = 1; col <= 8; col++){
 
+                ChessPosition position = new ChessPosition(row, col);
+                ChessPiece opponent = board.getPiece(position);
 
-        throw new RuntimeException("Not implemented");
+                // check all positions for opponents
+                if (opponent != null && opponent.getTeamColor() != teamColor) {
+                    // opponent found, checking all of their possible moves
+                    Collection<ChessMove> moves = opponent.pieceMoves(board, position);
+                    for (ChessMove move : moves){
+                        if (move.getEndPosition() == kingPosition) return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     /**
