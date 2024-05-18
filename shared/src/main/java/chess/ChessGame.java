@@ -57,7 +57,17 @@ public class ChessGame {
         if (pieceToMove == null) return null;
 
         // get list of all standard moves, regardless of King's safety
-        return pieceToMove.pieceMoves(getBoard(), startPosition);
+        Collection<ChessMove> allMoves = pieceToMove.pieceMoves(getBoard(), startPosition);
+
+        // filter all moves into all legal moves
+        Collection<ChessMove> legalMoves = new ArrayList<>();
+        for (ChessMove move : allMoves) {
+            if (!simulateMove(move)) {
+                legalMoves.add(move);
+            }
+        }
+
+        return legalMoves;
     }
 
     /**
