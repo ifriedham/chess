@@ -138,9 +138,22 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        Collection<ChessMove> moves = getAllMoves(teamColor, getBoard());
-        for (ChessMove move : moves){
-            if (!simulateMove(move)) return false;
+        if (isInCheck(teamColor)) {
+            return false;
+        }
+
+        Collection<ChessMove> allMoves = getAllMoves(teamColor, getBoard());
+        ChessBoard simBoard = cloneBoard(getBoard());
+
+        for (ChessMove move : allMoves) {
+            movePiece(simBoard, move);
+
+            if (!isInCheck(teamColor, simBoard)) {
+                return false;
+            }
+
+            // Reset the simulated board to its original state
+            simBoard = cloneBoard(getBoard());
         }
 
         return true;
