@@ -50,3 +50,6 @@ java -jar client/target/client-jar-with-dependencies.jar
 
 ♕ 240 Chess Client: chess.ChessPiece@7852e922
 ```
+
+[LINK](https://sequencediagram.org/index.html#initialData=C4S2BsFMAIBUAsQGdrOgQ2qCkBQuBBcEAY0gFoA+AIQHsAjALgGFiSBrDAOwBNoeATugDmWWtBIDI6YDExSAjgFdISYNFoCAOl2ABPAA4wwqLlngwktJQLIYpmYOOAXoUAGbBCbSAB5y5HRMgiJi0AC2tABueFy0shoxAtBBADQAItb0UBJsnE7QkDwmsgAewCx50AASkOAGEZBcStDumtAAVB0gXGoCSiSgtL1d3HxdkKXo4QZQSF24QVQAFADMAJSZStkwJFUFRSWTFXFc5D1q6LpXkNYo4apIIpBAA) to my personal sequenceDiagram for this project (phase 2)
+
