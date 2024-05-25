@@ -28,12 +28,11 @@ public class MemoryGameDAO implements GameDAO{
         return games.values();
     }
 
-    public void SaveGame(int gameID, GameData game) throws DataAccessException {
+    public GameData SaveGame(int gameID, GameData game) throws DataAccessException {
         if (games.containsKey(gameID)) {
             games.put(gameID, game);
-        } else {
-            throw new DataAccessException("GameID " + gameID + " does not exist in the games list.");
-        }
+            return game;
+        } else return null;
     }
 
     public void removeAllGames() {
