@@ -31,7 +31,6 @@ public class myAPITests {
 
     @Nested
     class testRegister {
-
         @Test
         public void testIncorrectInput() throws DataAccessException{
             UserDAO users = new MemoryUserDAO();
@@ -67,5 +66,7 @@ public class myAPITests {
         }
 
     }
+
+
 
 }

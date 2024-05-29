@@ -32,11 +32,21 @@ public class UserService {
         return new AuthData(token, username);
     }
 
-    public AuthData login(UserData user) {
-        return null;
+    public AuthData login(UserData loginData) throws DataAccessException {
+        UserData savedUser = userDAO.getUser(loginData.username());
+
+        if (!verifyLogin(loginData.password(), savedUser.password())) {
+            throw new DataAccessException("unauthorized");
+        }
+
+        return new AuthData(authDAO.createAuth(loginData.username()), loginData.username());
     }
 
-    public void logout(UserData user) {
+    private boolean verifyLogin(String givenPassword, String savedPassword) {
+        return givenPassword.equals(savedPassword);
+    }
+
+    public void logout(UserData user) throws DataAccessException {
     }
 
 }
