@@ -21,7 +21,7 @@ public class myAPITests {
         // create and call the test ClearService
         ClearService testClearService = new ClearService(users, games, auths);
         if (testClearService.clear() == null) {
-            System.out.println("Success!");
+            System.out.println("Data Cleared Successfully!");
         }
     }
 
