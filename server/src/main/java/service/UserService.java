@@ -29,7 +29,7 @@ public class UserService {
         userDAO.createUser(user);
         String username = user.username();
         String token = authDAO.createAuth(username);
-        return new AuthData(username, token);
+        return new AuthData(token, username);
     }
 
     public AuthData login(UserData user) {

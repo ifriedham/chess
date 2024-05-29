@@ -4,14 +4,14 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public class MemoryAuthDAO implements AuthDAO {
-    private HashMap<String, String> auths;
+    private final HashMap<String, String> auths;
     public MemoryAuthDAO() {
         auths = new HashMap<>();
     }
 
     public String createAuth(String username) {
         String authToken = UUID.randomUUID().toString();
-        auths.put(username, authToken);
+        auths.put(authToken, username);
         return authToken;
     }
 
