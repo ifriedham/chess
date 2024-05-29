@@ -15,11 +15,14 @@ public class MemoryUserDAO implements UserDAO {
     }
 
     public UserData getUser(String username) {
-        if (users != null) return users.get(username);
-        else return null;
+        return users.get(username);
     }
 
     public void removeAllUsers() {
         users.clear();
+    }
+
+    public boolean isEmpty() {
+        return users.isEmpty();
     }
 }
