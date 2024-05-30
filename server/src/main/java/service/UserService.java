@@ -35,14 +35,14 @@ public class UserService {
     public AuthData login(UserData loginData) throws DataAccessException {
         UserData savedUser = userDAO.getUser(loginData.username());
 
-        if (!verifyLogin(loginData.password(), savedUser.password())) {
+        if (!verifyPassword(loginData.password(), savedUser.password())) {
             throw new DataAccessException("unauthorized");
         }
 
         return new AuthData(authDAO.createAuth(loginData.username()), loginData.username());
     }
 
-    private boolean verifyLogin(String givenPassword, String savedPassword) {
+    private boolean verifyPassword(String givenPassword, String savedPassword) {
         return givenPassword.equals(savedPassword);
     }
 
