@@ -12,7 +12,7 @@ public class MemoryUserDAO implements UserDAO {
     public void createUser(UserData user) {
         users.put(user.username(), user);
     }
-    /* TODO: STORE PASSWORD AS A HASH */
+    /* TODO: STORE PASSWORD AS A HASH (in server?  non't hash it on the client's side)*/
 
     public UserData getUser(String username) {
         return users.get(username);

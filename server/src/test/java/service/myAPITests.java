@@ -6,6 +6,9 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import dataaccess.*;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 public class myAPITests {
 
     @Test
@@ -38,7 +41,10 @@ public class myAPITests {
             UserService userService = new UserService(auths, users);
 
             // run test here -> should throw exception "bad request"
-            userService.register(new UserData("no password giver", null, "IhatePasswords@live.com"));
+            Exception exception = assertThrows(DataAccessException.class, () -> {
+                userService.register(new UserData("no password giver", null, "IhatePasswords@live.com"));
+            });
+            assertEquals("bad request", exception.getMessage());
         }
 
         @Test
@@ -51,8 +57,10 @@ public class myAPITests {
 
             // run test here -> should throw exception "already taken"
             UserService userService = new UserService(auths, users);
-            userService.register(new UserData("copycat", "testPassword", "testEmail"));
-        }
+            Exception exception = assertThrows(DataAccessException.class, () -> {
+                userService.register(new UserData("copycat", "testPassword", "testEmail"));
+            });
+            assertEquals("already taken", exception.getMessage());        }
 
         @Test
         public void testRegisterSuccess() throws DataAccessException{
