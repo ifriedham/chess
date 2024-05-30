@@ -202,6 +202,32 @@ public class myAPITests {
             if (gameID == -1) System.out.println("ERROR: Game not created");
             else System.out.println("SUCCESS! :: GameID: " + gameID);
         }
+
+        @Test
+        public void testGameAlreadyExists() throws DataAccessException{
+            UserDAO users = new MemoryUserDAO();
+            GameDAO games = new MemoryGameDAO();
+            AuthDAO auths = new MemoryAuthDAO();
+            UserService userService = new UserService(auths, users);
+
+            // create and register a test user
+            UserData testUser = new UserData("testUser", "testPassword", "testEmail");
+            userService.register(testUser);
+
+            // login the test user, get auth token back
+            AuthData testToken = userService.login(testUser);
+
+            GameService gameService = new GameService(auths, games);
+
+            // create a game with the name "testGame"
+            gameService.createGame(testToken, "testGame");
+
+            // TEST HERE -> create duplicate game "testGame"
+            Exception exception = assertThrows(DataAccessException.class, () -> {
+                gameService.createGame(testToken, "testGame");
+            });
+            assertEquals("game already exists", exception.getMessage());
+        }
     }
 
 }
