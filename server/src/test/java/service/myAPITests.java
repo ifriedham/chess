@@ -230,4 +230,89 @@ public class myAPITests {
         }
     }
 
+    @Nested
+    class testListGame{
+        @Test
+        public void testListGameSuccess() throws DataAccessException{
+            UserDAO users = new MemoryUserDAO();
+            GameDAO games = new MemoryGameDAO();
+            AuthDAO auths = new MemoryAuthDAO();
+            UserService userService = new UserService(auths, users);
+
+            // create and register a test user
+            UserData testUser = new UserData("testUser", "testPassword", "testEmail");
+            userService.register(testUser);
+
+            // login the test user, get auth token back
+            AuthData testToken = userService.login(testUser);
+
+            GameService gameService = new GameService(auths, games);
+
+            // create some games
+            gameService.createGame(testToken, "testGame1");
+            gameService.createGame(testToken, "testGame2");
+            gameService.createGame(testToken, "testGame3");
+
+            // TEST HERE -> list games
+            System.out.println("Games: " + gameService.listGames(testToken));
+        }
+
+        @Test
+        public void testListGameUnauthorized() throws DataAccessException{
+            UserDAO users = new MemoryUserDAO();
+            GameDAO games = new MemoryGameDAO();
+            AuthDAO auths = new MemoryAuthDAO();
+            UserService userService = new UserService(auths, users);
+
+            // create and register a test user
+            UserData testUser = new UserData("testUser", "testPassword", "testEmail");
+            userService.register(testUser);
+
+            // login the test user, get auth token back
+            AuthData testToken = userService.login(testUser);
+
+            GameService gameService = new GameService(auths, games);
+
+            // create some games
+            gameService.createGame(testToken, "testGame1");
+            gameService.createGame(testToken, "testGame2");
+            gameService.createGame(testToken, "testGame3");
+
+            // TEST HERE -> list games with bad token
+            Exception exception = assertThrows(DataAccessException.class, () -> {
+                gameService.listGames(new AuthData("badToken", "testUser"));
+            });
+            assertEquals("unauthorized", exception.getMessage());
+        }
+    }
+
+    @Nested
+    class testJoinGame {
+        @Test
+        public
+
+    }
+
+    private GameService preppedGames() throws DataAccessException {
+        UserDAO users = new MemoryUserDAO();
+        GameDAO games = new MemoryGameDAO();
+        AuthDAO auths = new MemoryAuthDAO();
+        UserService userService = new UserService(auths, users);
+
+        // create and register a test user
+        UserData testUser = new UserData("testUser", "testPassword", "testEmail");
+        userService.register(testUser);
+
+        // login the test user, get auth token back
+        AuthData testToken = userService.login(testUser);
+
+        GameService gameService = new GameService(auths, games);
+
+        // create some games
+        gameService.createGame(testToken, "testGame1");
+        gameService.createGame(testToken, "testGame2");
+        gameService.createGame(testToken, "testGame3");
+
+        return gameService;
+    }
 }
