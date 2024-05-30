@@ -8,6 +8,7 @@ import model.AuthData;
 import model.GameData;
 import model.UserData;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -39,11 +40,17 @@ public class GameService {
 
 
 
-    public HashMap<Integer, GameData> listGames(AuthData authData) {
-        return null;
+    public Collection<GameData> listGames(AuthData authData) throws DataAccessException {
+        // check if given authData is valid
+        if (authData == null || authDAO.getAuth(authData.authToken()) == null) {
+            throw new DataAccessException("unauthorized");
+        }
+
+        // return a list of games
+        return gameDAO.listGames();
     }
 
-    public GameData joinGame(AuthData authData, String playerColor, int gameID) {
+    public GameData joinGame(AuthData authData, String playerColor, Integer gameID) {
         return null;
     }
 
