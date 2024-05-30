@@ -68,7 +68,7 @@ public class myAPITests {
     }
 
     @Nested
-class testLogin {
+    class testLogin {
         @Test
         public void testBadPassword() throws DataAccessException{
             UserDAO users = new MemoryUserDAO();
@@ -122,6 +122,43 @@ class testLogin {
             System.out.println("AuthData: " + testAuthData);
         }
 
+    }
+
+    @Nested
+    class testLogout{
+        @Test
+        public void testLogoutSuccess() throws DataAccessException{
+            UserDAO users = new MemoryUserDAO();
+            AuthDAO auths = new MemoryAuthDAO();
+            UserService userService = new UserService(auths, users);
+
+            // create and register a test user
+            UserData testUser = new UserData("testUser", "testPassword", "testEmail");
+            userService.register(testUser);
+
+            // login the test user
+            AuthData testToken = userService.login(testUser);
+
+            // run test here -> should print "Logout Successful!"
+            if (userService.logout(testToken)) System.out.println("Logout Successful!");
+        }
+
+        @Test
+        public void testBadAuth() throws DataAccessException{
+            UserDAO users = new MemoryUserDAO();
+            AuthDAO auths = new MemoryAuthDAO();
+            UserService userService = new UserService(auths, users);
+
+            // create and register a test user
+            UserData testUser = new UserData("testUser", "testPassword", "testEmail");
+            userService.register(testUser);
+
+            // login the test user
+            AuthData testToken = userService.login(testUser);
+
+            // run test here -> should print "unauthorized"
+            userService.logout(new AuthData("badToken", "testUser"));
+        }
     }
 
 }

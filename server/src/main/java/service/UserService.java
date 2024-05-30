@@ -5,6 +5,8 @@ import dataaccess.*;
 import model.AuthData;
 import model.UserData;
 
+import java.util.Objects;
+
 public class UserService {
     private final AuthDAO authDAO;
     private final UserDAO userDAO;
@@ -40,7 +42,7 @@ public class UserService {
             throw new DataAccessException("must fill all fields");
         }
 
-        // check if user exists
+        // check for bad username
         if (userDAO.getUser(loginData.username()) == null) {
             throw new DataAccessException("no account with that username found");
         }
@@ -56,10 +58,22 @@ public class UserService {
     }
 
     private boolean verifyPassword(String givenPassword, String savedPassword) {
+        /* TODO: FIGURE OUT HOW TO COMPARE THE PASSWORD TO A HASH */
+
         return givenPassword.equals(savedPassword);
     }
 
-    public void logout(UserData user) throws DataAccessException {
+    public boolean logout(AuthData userAuth) throws DataAccessException {
+        // check if authToken is correct
+        if (userAuth == null || authDAO.getAuth(userAuth.authToken()) == null) {
+            throw new DataAccessException("unauthorized");
+        }
+
+        // delete authToken from database
+        authDAO.deleteAuth(userAuth.authToken());
+
+        // return true if logout is successful
+        return authDAO.getAuth(userAuth.authToken()) == null;
     }
 
 }
