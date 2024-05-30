@@ -178,4 +178,30 @@ public class myAPITests {
             assertEquals("unauthorized", exception.getMessage());        }
     }
 
+    @Nested
+    class testCreateGame{
+        @Test
+        public void testCreateGameSuccess() throws DataAccessException{
+            UserDAO users = new MemoryUserDAO();
+            GameDAO games = new MemoryGameDAO();
+            AuthDAO auths = new MemoryAuthDAO();
+            UserService userService = new UserService(auths, users);
+
+            // create and register a test user
+            UserData testUser = new UserData("testUser", "testPassword", "testEmail");
+            userService.register(testUser);
+
+            // login the test user, get auth token back
+            AuthData testToken = userService.login(testUser);
+
+            // TEST RUN HERE -> create game, get gameID back
+            GameService gameService = new GameService(auths, games);
+            Integer gameID = -1;
+            gameID = gameService.createGame(testToken, "testGame");
+
+            if (gameID == -1) System.out.println("ERROR: Game not created");
+            else System.out.println("SUCCESS! :: GameID: " + gameID);
+        }
+    }
+
 }
