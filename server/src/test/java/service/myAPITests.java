@@ -70,7 +70,7 @@ public class myAPITests {
     @Nested
 class testLogin {
         @Test
-        public void testIncorrectPassword() throws DataAccessException{
+        public void testBadPassword() throws DataAccessException{
             UserDAO users = new MemoryUserDAO();
             AuthDAO auths = new MemoryAuthDAO();
 
@@ -80,6 +80,32 @@ class testLogin {
             // run test here -> should throw exception "unauthorized"
             UserService userService = new UserService(auths, users);
             userService.login(new UserData("testUser", "wrongPassword", "testEmail"));
+        }
+
+        @Test
+        public void testBadUsername() throws DataAccessException{
+            UserDAO users = new MemoryUserDAO();
+            AuthDAO auths = new MemoryAuthDAO();
+
+            // store a user with the username "testUser"
+            users.createUser(new UserData("testUser", "testPassword", "testEmail"));
+
+            // run test here -> should throw exception "unauthorized"
+            UserService userService = new UserService(auths, users);
+            userService.login(new UserData("badUsername", "testPassword", "testEmail"));
+        }
+
+        @Test
+        public void testEmptyFields() throws DataAccessException{
+            UserDAO users = new MemoryUserDAO();
+            AuthDAO auths = new MemoryAuthDAO();
+
+            // store a user with the username "testUser"
+            users.createUser(new UserData("testUser", "testPassword", "testEmail"));
+
+            // run test here -> should throw exception "must fill all fields"
+            UserService userService = new UserService(auths, users);
+            userService.login(new UserData("testUser", null, "testEmail"));
         }
 
         @Test

@@ -14,7 +14,6 @@ public class UserService {
         this.userDAO = userDAO;
     }
 
-
     public AuthData register(UserData user) throws DataAccessException {
          // test if all fields are filled
          if (user.username() == null || user.password() == null || user.email() == null) {
@@ -26,19 +25,33 @@ public class UserService {
             throw new DataAccessException("already taken");
         }
 
+        // create user and store in database
         userDAO.createUser(user);
         String username = user.username();
         String token = authDAO.createAuth(username);
+
+        // registration successful, returning AuthData object
         return new AuthData(token, username);
     }
 
     public AuthData login(UserData loginData) throws DataAccessException {
-        UserData savedUser = userDAO.getUser(loginData.username());
+        // test if all fields are filled
+        if (loginData.username() == null || loginData.password() == null) {
+            throw new DataAccessException("must fill all fields");
+        }
 
+        // check if user exists
+        if (userDAO.getUser(loginData.username()) == null) {
+            throw new DataAccessException("no account with that username found");
+        }
+
+        // check if given password matches the one in the database
+        UserData savedUser = userDAO.getUser(loginData.username());
         if (!verifyPassword(loginData.password(), savedUser.password())) {
             throw new DataAccessException("unauthorized");
         }
 
+        // correct login info given, returning AuthData object
         return new AuthData(authDAO.createAuth(loginData.username()), loginData.username());
     }
 
