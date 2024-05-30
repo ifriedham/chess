@@ -57,23 +57,26 @@ public class UserService {
         return new AuthData(authDAO.createAuth(loginData.username()), loginData.username());
     }
 
-    private boolean verifyPassword(String givenPassword, String savedPassword) {
-        /* TODO: FIGURE OUT HOW TO COMPARE THE PASSWORD TO A HASH */
-
-        return givenPassword.equals(savedPassword);
-    }
-
     public boolean logout(AuthData userAuth) throws DataAccessException {
         // check if authToken is correct
-        if (userAuth == null || authDAO.getAuth(userAuth.authToken()) == null) {
-            throw new DataAccessException("unauthorized");
+        if (verifyAuth(userAuth)) {
+            // delete authToken from database
+            authDAO.deleteAuth(userAuth.authToken());
         }
-
-        // delete authToken from database
-        authDAO.deleteAuth(userAuth.authToken());
 
         // return true if logout is successful
         return authDAO.getAuth(userAuth.authToken()) == null;
     }
 
+    private boolean verifyPassword(String givenPassword, String savedPassword) {
+        /* TODO: FIGURE OUT HOW TO COMPARE THE PASSWORD TO A HASH */
+
+        return givenPassword.equals(savedPassword);
+    }
+    private boolean verifyAuth(AuthData userAuth) throws DataAccessException {
+        if (userAuth == null || authDAO.getAuth(userAuth.authToken()) == null) {
+            throw new DataAccessException("unauthorized");
+        }
+        else return true;
+    }
 }

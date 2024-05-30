@@ -1,9 +1,11 @@
 package dataaccess;
 
+import chess.ChessGame;
 import model.GameData;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.UUID;
 
 public class MemoryGameDAO implements GameDAO{
     private HashMap<Integer, GameData> games;
@@ -12,14 +14,20 @@ public class MemoryGameDAO implements GameDAO{
         games = new HashMap<>();
     }
 
-    public int createGame(String gameName, int gameID) {
-        games.put(gameID, new GameData(gameID, null, null, gameName, null));
+    public Integer createGame(String authToken, String gameName) {
+        // generate game ID
+        Integer gameID = games.size() + 1;
 
-        if (games.containsKey(gameID)) return gameID; //success!
-        else return -1; //failure :(
+        // make new game
+        GameData newGame = new GameData(gameID, null, null, gameName, new ChessGame());
+
+        // put game in games
+        games.put(gameID, newGame);
+
+        return gameID;
     }
 
-    public GameData getGame(int gameID) {
+    public GameData getGame(Integer gameID) {
         if (games != null) return games.get(gameID);
         else return null;
     }
