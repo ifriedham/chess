@@ -87,11 +87,13 @@ public class myAPITests {
 
             // run test here -> should throw exception "unauthorized"
             UserService userService = new UserService(auths, users);
-            userService.login(new UserData("testUser", "wrongPassword", "testEmail"));
-        }
+            Exception exception = assertThrows(DataAccessException.class, () -> {
+                userService.login(new UserData("testUser", "wrongPassword", "testEmail"));
+            });
+            assertEquals("unauthorized", exception.getMessage());        }
 
         @Test
-        public void testBadUsername() throws DataAccessException{
+        public void testBadUsername() throws DataAccessException {
             UserDAO users = new MemoryUserDAO();
             AuthDAO auths = new MemoryAuthDAO();
 
@@ -100,7 +102,10 @@ public class myAPITests {
 
             // run test here -> should throw exception "unauthorized"
             UserService userService = new UserService(auths, users);
-            userService.login(new UserData("badUsername", "testPassword", "testEmail"));
+            Exception exception = assertThrows(DataAccessException.class, () -> {
+                userService.login(new UserData("testUser", "wrongPassword", "testEmail"));
+            });
+            assertEquals("unauthorized", exception.getMessage());
         }
 
         @Test
@@ -113,8 +118,10 @@ public class myAPITests {
 
             // run test here -> should throw exception "must fill all fields"
             UserService userService = new UserService(auths, users);
-            userService.login(new UserData("testUser", null, "testEmail"));
-        }
+            Exception exception = assertThrows(DataAccessException.class, () -> {
+                userService.login(new UserData("testUser", null, "testEmail"));
+            });
+            assertEquals("must fill all fields", exception.getMessage());        }
 
         @Test
         public void testLoginSuccess() throws DataAccessException{
@@ -165,8 +172,10 @@ public class myAPITests {
             AuthData testToken = userService.login(testUser);
 
             // run test here -> should print "unauthorized"
-            userService.logout(new AuthData("badToken", "testUser"));
-        }
+            Exception exception = assertThrows(DataAccessException.class, () -> {
+                userService.logout(new AuthData("badToken", "testUser"));
+            });
+            assertEquals("unauthorized", exception.getMessage());        }
     }
 
 }
