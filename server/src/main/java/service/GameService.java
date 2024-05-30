@@ -19,7 +19,7 @@ public class GameService {
         this.authDAO = authDAO;
         this.gameDAO = gameDAO;
     }
-    public GameData createGame(AuthData authData, String gameName) throws DataAccessException {
+    public Integer createGame(AuthData authData, String gameName) throws DataAccessException {
         // check if given authData is valid
         if (authData == null || authDAO.getAuth(authData.authToken()) == null) {
             throw new DataAccessException("unauthorized");
@@ -33,17 +33,11 @@ public class GameService {
             throw new DataAccessException("game already exists");
         }
 
-        // create game and store in database
-        gameDAO.createGame(gameName, gameID);
-
-
-        return null;
+        // create game and store in database, return gameID
+        return gameDAO.createGame(gameName, gameID);
     }
 
-    private Integer generateID(String gameName) {
-        Random generator = new Random(gameName.hashCode());
-        return 1000 + generator.nextInt(9000);
-    }
+
 
     public HashMap<Integer, GameData> listGames(AuthData authData) {
         return null;
@@ -53,4 +47,8 @@ public class GameService {
         return null;
     }
 
+    private Integer generateID(String gameName) {
+        Random generator = new Random(gameName.hashCode());
+        return 1000 + generator.nextInt(9000);
+    }
 }
