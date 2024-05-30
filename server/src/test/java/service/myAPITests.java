@@ -20,7 +20,7 @@ public class myAPITests {
 
         // populate the test DAOs
         users.createUser(new UserData("testUser", "testPassword", "testEmail"));
-        games.createGame("testToken", "testGame");
+        games.createGame("testGame", 1);
         auths.createAuth("testUsername");
 
         // create and call

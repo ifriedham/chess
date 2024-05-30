@@ -14,16 +14,11 @@ public class MemoryGameDAO implements GameDAO{
         games = new HashMap<>();
     }
 
-    public Integer createGame(String authToken, String gameName) {
-        // generate game ID
-        Integer gameID = games.size() + 1;
-
+    public Integer createGame(String gameName, Integer gameID) {
         // make new game
         GameData newGame = new GameData(gameID, null, null, gameName, new ChessGame());
-
         // put game in games
         games.put(gameID, newGame);
-
         return gameID;
     }
 

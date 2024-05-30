@@ -9,6 +9,7 @@ import model.GameData;
 import model.UserData;
 
 import java.util.HashMap;
+import java.util.Random;
 
 public class GameService {
     private final AuthDAO authDAO;
@@ -24,10 +25,24 @@ public class GameService {
             throw new DataAccessException("unauthorized");
         }
 
+        // get a game ID based off of the given game name
+        Integer gameID = generateID(gameName);
+
         // check if game with gameID already exists
+        if (gameDAO.getGame(gameID) != null) {
+            throw new DataAccessException("game already exists");
+        }
+
+        // create game and store in database
+        gameDAO.createGame(gameName, gameID);
 
 
         return null;
+    }
+
+    private Integer generateID(String gameName) {
+        Random generator = new Random(gameName.hashCode());
+        return 1000 + generator.nextInt(9000);
     }
 
     public HashMap<Integer, GameData> listGames(AuthData authData) {
