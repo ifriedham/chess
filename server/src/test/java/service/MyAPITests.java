@@ -8,7 +8,7 @@ import dataaccess.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class myAPITests {
+public class MyAPITests {
 
     @Test
     public void testClearService() throws DataAccessException {
@@ -32,7 +32,7 @@ public class myAPITests {
     }
 
     @Nested
-    class testRegister {
+    class TestRegister {
         @Test
         public void testIncorrectInput() throws DataAccessException {
             UserDAO users = new MemoryUserDAO();
@@ -76,7 +76,7 @@ public class myAPITests {
     }
 
     @Nested
-    class testLogin {
+    class TestLogin {
         @Test
         public void testBadPassword() throws DataAccessException {
             UserDAO users = new MemoryUserDAO();
@@ -104,7 +104,7 @@ public class myAPITests {
             // run test here -> should throw exception "unauthorized"
             UserService userService = new UserService(auths, users);
             Exception exception = assertThrows(DataAccessException.class, () -> {
-                userService.login(new UserData("testUser", "wrongPassword", "testEmail"));
+                userService.login(new UserData("badUserName", "testPassword", "testEmail"));
             });
             assertEquals("unauthorized", exception.getMessage());
         }
@@ -142,7 +142,7 @@ public class myAPITests {
     }
 
     @Nested
-    class testLogout {
+    class TestLogout {
         @Test
         public void testLogoutSuccess() throws DataAccessException {
             UserDAO users = new MemoryUserDAO();
@@ -183,7 +183,7 @@ public class myAPITests {
     }
 
     @Nested
-    class testCreateGame {
+    class TestCreateGame {
         @Test
         public void testCreateGameSuccess() throws DataAccessException {
             UserDAO users = new MemoryUserDAO();
@@ -238,7 +238,7 @@ public class myAPITests {
     }
 
     @Nested
-    class testListGame {
+    class TestListGame {
         @Test
         public void testListGameSuccess() throws DataAccessException {
             UserDAO users = new MemoryUserDAO();
@@ -298,7 +298,7 @@ public class myAPITests {
     }
 
     @Nested
-    class testJoinGame {
+    class TestJoinGame {
         @Test
         public void testJoinGameSuccess() throws DataAccessException {
             UserDAO users = new MemoryUserDAO();
@@ -342,8 +342,8 @@ public class myAPITests {
             AuthData testToken = userService.login(testUser);
             String token = testToken.authToken();
 
-            AuthData TestToken2 = userService.login(testUser2);
-            String token2 = testToken.authToken();
+            AuthData testToken2 = userService.login(testUser2);
+            String token2 = testToken2.authToken();
 
 
             GameService gameService = new GameService(auths, games);

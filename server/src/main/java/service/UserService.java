@@ -68,7 +68,7 @@ public class UserService {
     }
 
     private boolean verifyPassword(String givenPassword, String savedPassword) {
-        /* TODO: FIGURE OUT HOW TO COMPARE THE PASSWORD TO A HASH */
+        /* FIGURE OUT HOW TO COMPARE THE PASSWORD TO A HASH */
 
         return givenPassword.equals(savedPassword);
     }

@@ -60,7 +60,7 @@ public class GameService {
         GameData updatedGame = updateGame(game, userName, playerColor);
 
         // save updated game to database
-        return gameDAO.SaveGame(gameID, updatedGame);
+        return gameDAO.saveGame(gameID, updatedGame);
     }
 
     private GameData updateGame(GameData game, String userName, String playerColor) throws DataAccessException {
