@@ -17,10 +17,10 @@ public class UserService {
     }
 
     public AuthData register(UserData user) throws DataAccessException {
-         // test if all fields are filled
-         if (user.username() == null || user.password() == null || user.email() == null) {
-             throw new DataAccessException("bad request");
-         }
+        // test if all fields are filled
+        if (user.username() == null || user.password() == null || user.email() == null) {
+            throw new DataAccessException("bad request");
+        }
 
         // test if username is already taken
         if (userDAO.getUser(user.username()) != null) {
@@ -73,10 +73,10 @@ public class UserService {
 
         return givenPassword.equals(savedPassword);
     }
+
     private boolean verifyAuth(AuthData userAuth) throws DataAccessException {
         if (userAuth == null || authDAO.getAuth(userAuth.authToken()) == null) {
             throw new DataAccessException("unauthorized");
-        }
-        else return true;
+        } else return true;
     }
 }

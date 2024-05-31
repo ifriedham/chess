@@ -18,6 +18,7 @@ public class GameService {
         this.authDAO = authDAO;
         this.gameDAO = gameDAO;
     }
+
     public Integer createGame(AuthData authData, String gameName) throws DataAccessException {
         // check if given authData is valid
         if (!isValid(authData)) throw new DataAccessException("unauthorized");
@@ -87,7 +88,6 @@ public class GameService {
     private boolean isValid(AuthData authData) throws DataAccessException {
         if (authData == null || authDAO.getAuth(authData.authToken()) == null) {
             return false;
-        }
-        else return true;
+        } else return true;
     }
 }

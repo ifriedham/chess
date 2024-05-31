@@ -1,7 +1,7 @@
 package server;
+
 import com.google.gson.Gson;
 import model.*;
-import org.eclipse.jetty.server.Authentication;
 import service.*;
 import spark.*;
 import dataaccess.*;
@@ -16,7 +16,7 @@ public class Server {
 
     private final UserService userService = new UserService(auths, users);
     private final GameService gameService = new GameService(auths, games);
-    private final ClearService clearService= new ClearService(users, games, auths);
+    private final ClearService clearService = new ClearService(users, games, auths);
 
 
     public int run(int desiredPort) {
@@ -49,11 +49,10 @@ public class Server {
             AuthData result = userService.register(request);
 
             res.status(200);
-            var body = serializer.toJson(Map.of("username", result.username(), "authToken", registerResult.authToken()));
+            var body = serializer.toJson(Map.of("username", result.username(), "authToken", result.authToken()));
             res.body(body);
             return body;
-        }
-        catch (DataAccessException e) {
+        } catch (DataAccessException e) {
             return errorHandler(e, res);
         }
     }
@@ -69,8 +68,7 @@ public class Server {
             var body = serializer.toJson(Map.of("username", result.username(), "authToken", result.authToken()));
             res.body(body);
             return body;
-        }
-        catch (DataAccessException e) {
+        } catch (DataAccessException e) {
             return errorHandler(e, res);
         }
     }
@@ -87,11 +85,9 @@ public class Server {
             res.body(body);
             return body;
 
-        }
-        catch (DataAccessException e) {
+        } catch (DataAccessException e) {
             return errorHandler(e, res);
         }
-        return null;
     }
 
     private Object listGames(Request req, Response res) {
@@ -136,7 +132,7 @@ public class Server {
             String playerColor = req.queryParams("playerColor");
             Integer gameID = Integer.valueOf(req.queryParams("gameID"));
 
-            GameData result = gameService.joinGame(auth, playerColor, gameID);
+            gameService.joinGame(auth, playerColor, gameID);
 
             res.status(200);
             var body = "{}";
@@ -145,11 +141,12 @@ public class Server {
 
         } catch (DataAccessException e) {
             return errorHandler(e, res);
-        }    }
+        }
+    }
 
     private Object clear(Request req, Response res) {
         try {
-            var result = clearService.clear();
+            clearService.clear();
 
             res.status(200);
             res.body("{}");
@@ -164,33 +161,17 @@ public class Server {
 
     public Object errorHandler(Exception e, Response res) {
         String errorMessage = e.getMessage();
-        String responseMessage;
-        int statusCode;
-
-        switch (errorMessage) {
-            case "data not cleared.":
-            case "must fill all fields":
-            case "no account with that username found":
-            case "game already exists":
-                statusCode = 500;
-                break;
-
-            case "bad request":
-                statusCode = 400;
-                break;
-
-            case "unauthorized":
-                statusCode = 401;
-                break;
-
-            case "already taken":
-                statusCode = 403;
-                break;
-
-            default:
-                responseMessage = "Unknown error";
-                statusCode = 500;
-        }
+        int statusCode = 0;
+        statusCode = switch (errorMessage) {
+            case "data not cleared.",
+                    "must fill all fields",
+                    "no account with that username found",
+                    "game already exists" -> 500;
+            case "bad request" -> 400;
+            case "unauthorized" -> 401;
+            case "already taken" -> 403;
+            default -> statusCode;
+        };
 
         var body = new Gson().toJson(Map.of("message", "Error: " + errorMessage));
         res.type("application/json");

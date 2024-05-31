@@ -6,10 +6,12 @@ import java.util.HashMap;
 
 public class MemoryUserDAO implements UserDAO {
     private HashMap<String, UserData> users;
+
     public MemoryUserDAO() {
         users = new HashMap<>();
     }
-public void createUser(UserData user) {
+
+    public void createUser(UserData user) {
         users.put(user.username(), user);
     }
     /* TODO: STORE PASSWORD AS A HASH (in server?  non't hash it on the client's side)*/

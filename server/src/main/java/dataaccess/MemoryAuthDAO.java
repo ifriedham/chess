@@ -5,6 +5,7 @@ import java.util.UUID;
 
 public class MemoryAuthDAO implements AuthDAO {
     private final HashMap<String, String> auths;
+
     public MemoryAuthDAO() {
         auths = new HashMap<>();
     }

@@ -35,7 +35,7 @@ public class myAPITests {
     @Nested
     class testRegister {
         @Test
-        public void testIncorrectInput() throws DataAccessException{
+        public void testIncorrectInput() throws DataAccessException {
             UserDAO users = new MemoryUserDAO();
             AuthDAO auths = new MemoryAuthDAO();
             UserService userService = new UserService(auths, users);
@@ -48,7 +48,7 @@ public class myAPITests {
         }
 
         @Test
-        public void testUsernameTaken() throws DataAccessException{
+        public void testUsernameTaken() throws DataAccessException {
             UserDAO users = new MemoryUserDAO();
             AuthDAO auths = new MemoryAuthDAO();
 
@@ -60,10 +60,11 @@ public class myAPITests {
             Exception exception = assertThrows(DataAccessException.class, () -> {
                 userService.register(new UserData("copycat", "testPassword", "testEmail"));
             });
-            assertEquals("already taken", exception.getMessage());        }
+            assertEquals("already taken", exception.getMessage());
+        }
 
         @Test
-        public void testRegisterSuccess() throws DataAccessException{
+        public void testRegisterSuccess() throws DataAccessException {
             UserDAO users = new MemoryUserDAO();
             AuthDAO auths = new MemoryAuthDAO();
             UserService userService = new UserService(auths, users);
@@ -78,7 +79,7 @@ public class myAPITests {
     @Nested
     class testLogin {
         @Test
-        public void testBadPassword() throws DataAccessException{
+        public void testBadPassword() throws DataAccessException {
             UserDAO users = new MemoryUserDAO();
             AuthDAO auths = new MemoryAuthDAO();
 
@@ -90,7 +91,8 @@ public class myAPITests {
             Exception exception = assertThrows(DataAccessException.class, () -> {
                 userService.login(new UserData("testUser", "wrongPassword", "testEmail"));
             });
-            assertEquals("unauthorized", exception.getMessage());        }
+            assertEquals("unauthorized", exception.getMessage());
+        }
 
         @Test
         public void testBadUsername() throws DataAccessException {
@@ -109,7 +111,7 @@ public class myAPITests {
         }
 
         @Test
-        public void testEmptyFields() throws DataAccessException{
+        public void testEmptyFields() throws DataAccessException {
             UserDAO users = new MemoryUserDAO();
             AuthDAO auths = new MemoryAuthDAO();
 
@@ -121,10 +123,11 @@ public class myAPITests {
             Exception exception = assertThrows(DataAccessException.class, () -> {
                 userService.login(new UserData("testUser", null, "testEmail"));
             });
-            assertEquals("must fill all fields", exception.getMessage());        }
+            assertEquals("must fill all fields", exception.getMessage());
+        }
 
         @Test
-        public void testLoginSuccess() throws DataAccessException{
+        public void testLoginSuccess() throws DataAccessException {
             UserDAO users = new MemoryUserDAO();
             AuthDAO auths = new MemoryAuthDAO();
 
@@ -140,9 +143,9 @@ public class myAPITests {
     }
 
     @Nested
-    class testLogout{
+    class testLogout {
         @Test
-        public void testLogoutSuccess() throws DataAccessException{
+        public void testLogoutSuccess() throws DataAccessException {
             UserDAO users = new MemoryUserDAO();
             AuthDAO auths = new MemoryAuthDAO();
             UserService userService = new UserService(auths, users);
@@ -159,7 +162,7 @@ public class myAPITests {
         }
 
         @Test
-        public void testBadAuth() throws DataAccessException{
+        public void testBadAuth() throws DataAccessException {
             UserDAO users = new MemoryUserDAO();
             AuthDAO auths = new MemoryAuthDAO();
             UserService userService = new UserService(auths, users);
@@ -175,13 +178,14 @@ public class myAPITests {
             Exception exception = assertThrows(DataAccessException.class, () -> {
                 userService.logout(new AuthData("badToken", "testUser"));
             });
-            assertEquals("unauthorized", exception.getMessage());        }
+            assertEquals("unauthorized", exception.getMessage());
+        }
     }
 
     @Nested
-    class testCreateGame{
+    class testCreateGame {
         @Test
-        public void testCreateGameSuccess() throws DataAccessException{
+        public void testCreateGameSuccess() throws DataAccessException {
             UserDAO users = new MemoryUserDAO();
             GameDAO games = new MemoryGameDAO();
             AuthDAO auths = new MemoryAuthDAO();
@@ -204,7 +208,7 @@ public class myAPITests {
         }
 
         @Test
-        public void testGameAlreadyExists() throws DataAccessException{
+        public void testGameAlreadyExists() throws DataAccessException {
             UserDAO users = new MemoryUserDAO();
             GameDAO games = new MemoryGameDAO();
             AuthDAO auths = new MemoryAuthDAO();
@@ -231,9 +235,9 @@ public class myAPITests {
     }
 
     @Nested
-    class testListGame{
+    class testListGame {
         @Test
-        public void testListGameSuccess() throws DataAccessException{
+        public void testListGameSuccess() throws DataAccessException {
             UserDAO users = new MemoryUserDAO();
             GameDAO games = new MemoryGameDAO();
             AuthDAO auths = new MemoryAuthDAO();
@@ -258,7 +262,7 @@ public class myAPITests {
         }
 
         @Test
-        public void testListGameUnauthorized() throws DataAccessException{
+        public void testListGameUnauthorized() throws DataAccessException {
             UserDAO users = new MemoryUserDAO();
             GameDAO games = new MemoryGameDAO();
             AuthDAO auths = new MemoryAuthDAO();
@@ -289,7 +293,7 @@ public class myAPITests {
     @Nested
     class testJoinGame {
         @Test
-        public void testJoinGameSuccess() throws DataAccessException{
+        public void testJoinGameSuccess() throws DataAccessException {
             UserDAO users = new MemoryUserDAO();
             GameDAO games = new MemoryGameDAO();
             AuthDAO auths = new MemoryAuthDAO();
@@ -313,7 +317,7 @@ public class myAPITests {
         }
 
         @Test
-        public void testColorAlreadyTaken() throws DataAccessException{
+        public void testColorAlreadyTaken() throws DataAccessException {
             UserDAO users = new MemoryUserDAO();
             GameDAO games = new MemoryGameDAO();
             AuthDAO auths = new MemoryAuthDAO();
@@ -340,6 +344,8 @@ public class myAPITests {
                 gameService.joinGame(TestToken2, "WHITE", gameID);
             });
             assertEquals("already taken", exception.getMessage());
-        };
+        }
+
+        ;
     }
 }

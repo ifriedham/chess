@@ -13,7 +13,7 @@ public class ClearService {
         this.auths = auths;
     }
 
-    public Object clear() throws DataAccessException{
+    public Object clear() throws DataAccessException {
         users.removeAllUsers();
         games.removeAllGames();
         auths.removeAllAuthTokens();
