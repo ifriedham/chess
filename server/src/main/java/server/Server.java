@@ -169,15 +169,30 @@ public class Server {
 
         switch (errorMessage) {
             case "data not cleared.":
-                responseMessage = errorMessage;
+            case "must fill all fields":
+            case "no account with that username found":
+            case "game already exists":
                 statusCode = 500;
                 break;
+
+            case "bad request":
+                statusCode = 400;
+                break;
+
+            case "unauthorized":
+                statusCode = 401;
+                break;
+
+            case "already taken":
+                statusCode = 403;
+                break;
+
             default:
                 responseMessage = "Unknown error";
                 statusCode = 500;
         }
 
-        var body = new Gson().toJson(Map.of("message", "Error: " + responseMessage));
+        var body = new Gson().toJson(Map.of("message", "Error: " + errorMessage));
         res.type("application/json");
         res.status(statusCode);
         res.body(body);

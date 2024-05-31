@@ -22,6 +22,8 @@ public class GameService {
         // check if given authData is valid
         if (!isValid(authData)) throw new DataAccessException("unauthorized");
 
+        if (gameName == null) throw new DataAccessException("bad request");
+
         // get a game ID based off of the given game name
         Integer gameID = generateID(gameName);
 
