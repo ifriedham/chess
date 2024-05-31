@@ -75,8 +75,7 @@ public class Server {
 
     private Object logout(Request req, Response res) {
         try {
-            var serializer = new Gson();
-            AuthData request = serializer.fromJson(req.body(), AuthData.class);
+            String request = req.headers("Authorization");
 
             userService.logout(request);
 
@@ -93,9 +92,8 @@ public class Server {
     private Object listGames(Request req, Response res) {
         try {
             var serializer = new Gson();
-            AuthData request = serializer.fromJson(req.body(), AuthData.class);
-
-            Collection<GameData> result = gameService.listGames(request);
+            String authToken = req.headers("Authorization");
+            Collection<GameData> result = gameService.listGames(authToken);
 
             res.status(200);
             var body = serializer.toJson(Map.of("games", result));
@@ -110,10 +108,11 @@ public class Server {
     private Object createGame(Request req, Response res) {
         try {
             var serializer = new Gson();
-            AuthData auth = serializer.fromJson(req.body(), AuthData.class);
-            String gameName = req.queryParams("gameName");
+            String authToken = req.headers("Authorization");
+            GameData request = serializer.fromJson(req.body(), GameData.class);
+            String gameName = request.gameName();
 
-            Integer result = gameService.createGame(auth, gameName);
+            Integer result = gameService.createGame(authToken, gameName);
 
             res.status(200);
             var body = serializer.toJson(Map.of("gameID", result));
@@ -128,11 +127,12 @@ public class Server {
     private Object joinGame(Request req, Response res) {
         try {
             var serializer = new Gson();
-            AuthData auth = serializer.fromJson(req.body(), AuthData.class);
-            String playerColor = req.queryParams("playerColor");
-            Integer gameID = Integer.valueOf(req.queryParams("gameID"));
+            var request = serializer.fromJson(req.body(), JoinRequest.class);
+            String authToken = req.headers("Authorization");
+            String playerColor = request.playerColor();
+            Integer gameID = request.gameID();
 
-            gameService.joinGame(auth, playerColor, gameID);
+            gameService.joinGame(authToken, playerColor, gameID);
 
             res.status(200);
             var body = "{}";

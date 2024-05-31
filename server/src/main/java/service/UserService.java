@@ -44,7 +44,7 @@ public class UserService {
 
         // check for bad username
         if (userDAO.getUser(loginData.username()) == null) {
-            throw new DataAccessException("no account with that username found");
+            throw new DataAccessException("unauthorized");
         }
 
         // check if given password matches the one in the database
@@ -57,15 +57,15 @@ public class UserService {
         return new AuthData(authDAO.createAuth(loginData.username()), loginData.username());
     }
 
-    public boolean logout(AuthData userAuth) throws DataAccessException {
+    public boolean logout(String authToken) throws DataAccessException {
         // check if authToken is correct
-        if (verifyAuth(userAuth)) {
+        if (verifyAuth(authToken)) {
             // delete authToken from database
-            authDAO.deleteAuth(userAuth.authToken());
+            authDAO.deleteAuth(authToken);
         }
 
         // return true if logout is successful
-        return authDAO.getAuth(userAuth.authToken()) == null;
+        return authDAO.getAuth(authToken) == null;
     }
 
     private boolean verifyPassword(String givenPassword, String savedPassword) {
@@ -74,8 +74,8 @@ public class UserService {
         return givenPassword.equals(savedPassword);
     }
 
-    private boolean verifyAuth(AuthData userAuth) throws DataAccessException {
-        if (userAuth == null || authDAO.getAuth(userAuth.authToken()) == null) {
+    private boolean verifyAuth(String authToken) throws DataAccessException {
+        if (authToken == null || authDAO.getAuth(authToken) == null) {
             throw new DataAccessException("unauthorized");
         } else return true;
     }

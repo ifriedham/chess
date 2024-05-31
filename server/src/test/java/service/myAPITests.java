@@ -157,8 +157,9 @@ public class myAPITests {
             // login the test user
             AuthData testToken = userService.login(testUser);
 
+
             // run test here -> should print "Logout Successful!"
-            if (userService.logout(testToken)) System.out.println("Logout Successful!");
+            if (userService.logout(testToken.authToken())) System.out.println("Logout Successful!");
         }
 
         @Test
@@ -176,7 +177,7 @@ public class myAPITests {
 
             // run test here -> should print "unauthorized"
             Exception exception = assertThrows(DataAccessException.class, () -> {
-                userService.logout(new AuthData("badToken", "testUser"));
+                userService.logout("badToken");
             });
             assertEquals("unauthorized", exception.getMessage());
         }
@@ -197,11 +198,12 @@ public class myAPITests {
 
             // login the test user, get auth token back
             AuthData testToken = userService.login(testUser);
+            String token = testToken.authToken();
 
             // TEST RUN HERE -> create game, get gameID back
             GameService gameService = new GameService(auths, games);
             Integer gameID = -1;
-            gameID = gameService.createGame(testToken, "testGame");
+            gameID = gameService.createGame(token, "testGame");
 
             if (gameID == -1) System.out.println("ERROR: Game not created");
             else System.out.println("SUCCESS! :: GameID: " + gameID);
@@ -220,15 +222,17 @@ public class myAPITests {
 
             // login the test user, get auth token back
             AuthData testToken = userService.login(testUser);
+            String token = testToken.authToken();
+
 
             GameService gameService = new GameService(auths, games);
 
             // create a game with the name "testGame"
-            gameService.createGame(testToken, "testGame");
+            gameService.createGame(token, "testGame");
 
             // TEST HERE -> create duplicate game "testGame"
             Exception exception = assertThrows(DataAccessException.class, () -> {
-                gameService.createGame(testToken, "testGame");
+                gameService.createGame(token, "testGame");
             });
             assertEquals("game already exists", exception.getMessage());
         }
@@ -249,16 +253,18 @@ public class myAPITests {
 
             // login the test user, get auth token back
             AuthData testToken = userService.login(testUser);
+            String token = testToken.authToken();
+
 
             GameService gameService = new GameService(auths, games);
 
             // create some games
-            gameService.createGame(testToken, "testGame1");
-            gameService.createGame(testToken, "testGame2");
-            gameService.createGame(testToken, "testGame3");
+            gameService.createGame(token, "testGame1");
+            gameService.createGame(token, "testGame2");
+            gameService.createGame(token, "testGame3");
 
             // TEST HERE -> list games
-            System.out.println("Games: " + gameService.listGames(testToken));
+            System.out.println("Games: " + gameService.listGames(token));
         }
 
         @Test
@@ -274,17 +280,19 @@ public class myAPITests {
 
             // login the test user, get auth token back
             AuthData testToken = userService.login(testUser);
+            String token = testToken.authToken();
+
 
             GameService gameService = new GameService(auths, games);
 
             // create some games
-            gameService.createGame(testToken, "testGame1");
-            gameService.createGame(testToken, "testGame2");
-            gameService.createGame(testToken, "testGame3");
+            gameService.createGame(token, "testGame1");
+            gameService.createGame(token, "testGame2");
+            gameService.createGame(token, "testGame3");
 
             // TEST HERE -> list games with bad token
             Exception exception = assertThrows(DataAccessException.class, () -> {
-                gameService.listGames(new AuthData("badToken", "testUser"));
+                gameService.listGames("badToken");
             });
             assertEquals("unauthorized", exception.getMessage());
         }
@@ -305,14 +313,16 @@ public class myAPITests {
 
             // login the test user, get auth token back
             AuthData testToken = userService.login(testUser);
+            String token = testToken.authToken();
+
 
             GameService gameService = new GameService(auths, games);
 
             // create a game
-            Integer gameID = gameService.createGame(testToken, "testGame");
+            Integer gameID = gameService.createGame(token, "testGame");
 
             // TEST HERE -> join game
-            GameData testGameData = gameService.joinGame(testToken, "WHITE", gameID);
+            GameData testGameData = gameService.joinGame(token,"WHITE",gameID);
             System.out.println("GameData: " + testGameData);
         }
 
@@ -331,17 +341,21 @@ public class myAPITests {
 
             // login the test users, get auth tokens back
             AuthData testToken = userService.login(testUser);
+            String token = testToken.authToken();
+
             AuthData TestToken2 = userService.login(testUser2);
+            String token2 = testToken.authToken();
+
 
             GameService gameService = new GameService(auths, games);
 
             // create a game, populate with a white player
-            Integer gameID = gameService.createGame(testToken, "testGame");
-            gameService.joinGame(testToken, "WHITE", gameID);
+            Integer gameID = gameService.createGame(token, "testGame");
+            gameService.joinGame(token, "WHITE", gameID);
 
             // TEST HERE -> join game with another white player
             Exception exception = assertThrows(DataAccessException.class, () -> {
-                gameService.joinGame(TestToken2, "WHITE", gameID);
+                gameService.joinGame(token2, "WHITE", gameID);
             });
             assertEquals("already taken", exception.getMessage());
         }
