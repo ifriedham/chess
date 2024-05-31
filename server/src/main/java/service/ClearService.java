@@ -19,12 +19,11 @@ public class ClearService {
         auths.removeAllAuthTokens();
 
         if (clearStatus()) return null;
-        else return "Error: data not cleared.";
+        else throw new DataAccessException("Error: data not cleared.");
     }
 
     private boolean clearStatus() throws DataAccessException {
-        if (users.isEmpty() && games.isEmpty() && auths.isEmpty()) return true;
-        else return false;
+        return users.isEmpty() && games.isEmpty() && auths.isEmpty();
     }
 
 }
