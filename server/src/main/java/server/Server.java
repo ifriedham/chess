@@ -6,6 +6,7 @@ import service.*;
 import spark.*;
 import dataaccess.*;
 
+import java.util.Collection;
 import java.util.Map;
 
 public class Server {
@@ -44,6 +45,7 @@ public class Server {
         try {
             var serializer = new Gson();
             UserData request = serializer.fromJson(req.body(), UserData.class);
+
             AuthData result = userService.register(request);
 
             res.status(200);
@@ -60,10 +62,11 @@ public class Server {
         try {
             var serializer = new Gson();
             UserData request = serializer.fromJson(req.body(), UserData.class);
+
             AuthData result = userService.login(request);
 
             res.status(200);
-            var body = serializer.toJson(Map.of("username", result.username(), "authToken", registerResult.authToken()));
+            var body = serializer.toJson(Map.of("username", result.username(), "authToken", result.authToken()));
             res.body(body);
             return body;
         }
@@ -76,12 +79,14 @@ public class Server {
         try {
             var serializer = new Gson();
             AuthData request = serializer.fromJson(req.body(), AuthData.class);
-            if (userService.logout(request)) {
-                res.status(200);
-                var body = "{}";
-                res.body(body);
-                return body;
-            }
+
+            userService.logout(request);
+
+            res.status(200);
+            var body = "{}";
+            res.body(body);
+            return body;
+
         }
         catch (DataAccessException e) {
             return errorHandler(e, res);
@@ -90,16 +95,57 @@ public class Server {
     }
 
     private Object listGames(Request req, Response res) {
-        return null;
+        try {
+            var serializer = new Gson();
+            AuthData request = serializer.fromJson(req.body(), AuthData.class);
+
+            Collection<GameData> result = gameService.listGames(request);
+
+            res.status(200);
+            var body = serializer.toJson(Map.of("games", result));
+            res.body(body);
+            return body;
+
+        } catch (DataAccessException e) {
+            return errorHandler(e, res);
+        }
     }
 
     private Object createGame(Request req, Response res) {
-        return null;
+        try {
+            var serializer = new Gson();
+            AuthData auth = serializer.fromJson(req.body(), AuthData.class);
+            String gameName = req.queryParams("gameName");
+
+            Integer result = gameService.createGame(auth, gameName);
+
+            res.status(200);
+            var body = serializer.toJson(Map.of("gameID", result));
+            res.body(body);
+            return body;
+
+        } catch (DataAccessException e) {
+            return errorHandler(e, res);
+        }
     }
 
     private Object joinGame(Request req, Response res) {
-        return null;
-    }
+        try {
+            var serializer = new Gson();
+            AuthData auth = serializer.fromJson(req.body(), AuthData.class);
+            String playerColor = req.queryParams("playerColor");
+            Integer gameID = Integer.valueOf(req.queryParams("gameID"));
+
+            GameData result = gameService.joinGame(auth, playerColor, gameID);
+
+            res.status(200);
+            var body = "{}";
+            res.body(body);
+            return body;
+
+        } catch (DataAccessException e) {
+            return errorHandler(e, res);
+        }    }
 
     private Object clear(Request req, Response res) {
         try {
