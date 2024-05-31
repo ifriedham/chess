@@ -73,6 +73,19 @@ public class Server {
     }
 
     private Object logout(Request req, Response res) {
+        try {
+            var serializer = new Gson();
+            AuthData request = serializer.fromJson(req.body(), AuthData.class);
+            if (userService.logout(request)) {
+                res.status(200);
+                var body = "{}";
+                res.body(body);
+                return body;
+            }
+        }
+        catch (DataAccessException e) {
+            return errorHandler(e, res);
+        }
         return null;
     }
 
