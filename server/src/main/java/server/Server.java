@@ -6,6 +6,8 @@ import service.UserService;
 import spark.*;
 import dataaccess.*;
 
+import java.util.Map;
+
 public class Server {
     private final UserDAO users = new MemoryUserDAO();
     private final GameDAO games = new MemoryGameDAO();
@@ -63,18 +65,43 @@ public class Server {
     }
 
     private Object clear(Request req, Response res) throws DataAccessException {
-        var result = clearService.clear();
-        if (result == null) {
-            res.status(200);
-            return "{}";
-        } else {
-            res.status(500);
-            return new Gson().toJson(result);
+        try {
+            var result = clearService.clear();
+            if (result == null) {
+                res.status(200);
+                res.body("{}");
+                return "{}";
+            }
+        } catch (DataAccessException e) {
+            return errorHandler(e, res);
         }
-
+        return null;
     }
 
     /* end handlers*/
+
+    public Object errorHandler(Exception e, Response res) {
+        String errorMessage = e.getMessage();
+        String responseMessage;
+        int statusCode;
+
+        switch (errorMessage) {
+            case "data not cleared.":
+                responseMessage = errorMessage;
+                statusCode = 500;
+                break;
+            default:
+                responseMessage = "Unknown error";
+                statusCode = 500;
+        }
+
+        var body = new Gson().toJson(Map.of("message", "Error: " + responseMessage));
+        res.type("application/json");
+        res.status(statusCode);
+        res.body(body);
+        return body;
+    }
+
 
     public void stop() {
         Spark.stop();

@@ -19,7 +19,7 @@ public class ClearService {
         auths.removeAllAuthTokens();
 
         if (clearStatus()) return null;
-        else throw new DataAccessException("Error: data not cleared.");
+        else throw new DataAccessException("data not cleared.");
     }
 
     private boolean clearStatus() throws DataAccessException {
