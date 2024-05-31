@@ -289,30 +289,57 @@ public class myAPITests {
     @Nested
     class testJoinGame {
         @Test
-        public
+        public void testJoinGameSuccess() throws DataAccessException{
+            UserDAO users = new MemoryUserDAO();
+            GameDAO games = new MemoryGameDAO();
+            AuthDAO auths = new MemoryAuthDAO();
+            UserService userService = new UserService(auths, users);
 
-    }
+            // create and register a test user
+            UserData testUser = new UserData("testUser", "testPassword", "testEmail");
+            userService.register(testUser);
 
-    private GameService preppedGames() throws DataAccessException {
-        UserDAO users = new MemoryUserDAO();
-        GameDAO games = new MemoryGameDAO();
-        AuthDAO auths = new MemoryAuthDAO();
-        UserService userService = new UserService(auths, users);
+            // login the test user, get auth token back
+            AuthData testToken = userService.login(testUser);
 
-        // create and register a test user
-        UserData testUser = new UserData("testUser", "testPassword", "testEmail");
-        userService.register(testUser);
+            GameService gameService = new GameService(auths, games);
 
-        // login the test user, get auth token back
-        AuthData testToken = userService.login(testUser);
+            // create a game
+            Integer gameID = gameService.createGame(testToken, "testGame");
 
-        GameService gameService = new GameService(auths, games);
+            // TEST HERE -> join game
+            GameData testGameData = gameService.joinGame(testToken, "WHITE", gameID);
+            System.out.println("GameData: " + testGameData);
+        }
 
-        // create some games
-        gameService.createGame(testToken, "testGame1");
-        gameService.createGame(testToken, "testGame2");
-        gameService.createGame(testToken, "testGame3");
+        @Test
+        public void testColorAlreadyTaken() throws DataAccessException{
+            UserDAO users = new MemoryUserDAO();
+            GameDAO games = new MemoryGameDAO();
+            AuthDAO auths = new MemoryAuthDAO();
+            UserService userService = new UserService(auths, users);
 
-        return gameService;
+            // create and register two test users
+            UserData testUser = new UserData("testUser", "testPassword", "testEmail");
+            UserData testUser2 = new UserData("testUser2", "testPassword2", "testEmail2");
+            userService.register(testUser);
+            userService.register(testUser2);
+
+            // login the test users, get auth tokens back
+            AuthData testToken = userService.login(testUser);
+            AuthData TestToken2 = userService.login(testUser2);
+
+            GameService gameService = new GameService(auths, games);
+
+            // create a game, populate with a white player
+            Integer gameID = gameService.createGame(testToken, "testGame");
+            gameService.joinGame(testToken, "WHITE", gameID);
+
+            // TEST HERE -> join game with another white player
+            Exception exception = assertThrows(DataAccessException.class, () -> {
+                gameService.joinGame(TestToken2, "WHITE", gameID);
+            });
+            assertEquals("already taken", exception.getMessage());
+        };
     }
 }
