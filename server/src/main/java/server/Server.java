@@ -1,8 +1,8 @@
 package server;
 import com.google.gson.Gson;
-import service.ClearService;
-import service.GameService;
-import service.UserService;
+import model.*;
+import org.eclipse.jetty.server.Authentication;
+import service.*;
 import spark.*;
 import dataaccess.*;
 
@@ -41,11 +41,35 @@ public class Server {
 
     /* handlers */
     private Object registration(Request req, Response res) {
-        return null;
+        try {
+            var serializer = new Gson();
+            UserData request = serializer.fromJson(req.body(), UserData.class);
+            AuthData result = userService.register(request);
+
+            res.status(200);
+            var body = serializer.toJson(Map.of("username", result.username(), "authToken", registerResult.authToken()));
+            res.body(body);
+            return body;
+        }
+        catch (DataAccessException e) {
+            return errorHandler(e, res);
+        }
     }
 
     private Object login(Request req, Response res) {
-        return null;
+        try {
+            var serializer = new Gson();
+            UserData request = serializer.fromJson(req.body(), UserData.class);
+            AuthData result = userService.login(request);
+
+            res.status(200);
+            var body = serializer.toJson(Map.of("username", result.username(), "authToken", registerResult.authToken()));
+            res.body(body);
+            return body;
+        }
+        catch (DataAccessException e) {
+            return errorHandler(e, res);
+        }
     }
 
     private Object logout(Request req, Response res) {
@@ -64,18 +88,17 @@ public class Server {
         return null;
     }
 
-    private Object clear(Request req, Response res) throws DataAccessException {
+    private Object clear(Request req, Response res) {
         try {
             var result = clearService.clear();
-            if (result == null) {
-                res.status(200);
-                res.body("{}");
-                return "{}";
-            }
+
+            res.status(200);
+            res.body("{}");
+
+            return "{}";
         } catch (DataAccessException e) {
             return errorHandler(e, res);
         }
-        return null;
     }
 
     /* end handlers*/
