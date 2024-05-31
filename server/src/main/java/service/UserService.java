@@ -5,7 +5,6 @@ import dataaccess.*;
 import model.AuthData;
 import model.UserData;
 
-import java.util.Objects;
 
 public class UserService {
     private final AuthDAO authDAO;

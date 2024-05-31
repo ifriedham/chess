@@ -1,7 +1,6 @@
 package service;
 
 import model.*;
-import org.eclipse.jetty.server.Authentication;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import dataaccess.*;
