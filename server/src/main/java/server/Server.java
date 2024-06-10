@@ -6,6 +6,7 @@ import service.*;
 import spark.*;
 import dataaccess.*;
 
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Map;
 
@@ -19,7 +20,14 @@ public class Server {
     private final ClearService clearService = new ClearService(users, games, auths);
 
 
+    public static void main(String[] args) throws SQLException, DataAccessException {
+        Server server = new Server();
+        server.initializeDB();
+    }
 
+    private void initializeDB() throws SQLException, DataAccessException {
+        MySqlDataAccess dataAccess = new MySqlDataAccess();
+    }
 
 
     public int run(int desiredPort) {
