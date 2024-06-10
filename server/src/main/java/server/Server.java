@@ -19,11 +19,13 @@ public class Server {
     private final ClearService clearService = new ClearService(users, games, auths);
 
 
+
+
+
     public int run(int desiredPort) {
         Spark.port(desiredPort);
 
         Spark.staticFiles.location("web");
-
 
         // Register your endpoints and handle exceptions here.
         Spark.post("/user", this::registration);    // registration
