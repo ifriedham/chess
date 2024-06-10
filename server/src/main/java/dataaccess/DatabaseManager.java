@@ -52,8 +52,7 @@ public class DatabaseManager {
 
         // Create users table
         statement = "CREATE TABLE IF NOT EXISTS users (" +
-                "id INT NOT NULL PRIMARY KEY, " +
-                "username VARCHAR(255), " +
+                "username VARCHAR(255) PRIMARY KEY , " +
                 "password VARCHAR(255), " +
                 "email VARCHAR(255)" +
                 ")";
@@ -63,7 +62,6 @@ public class DatabaseManager {
 
         // Create the games table
         statement = "CREATE TABLE IF NOT EXISTS games (" +
-                "id INT NOT NULL," +
                 "gameID VARCHAR(255) NOT NULL PRIMARY KEY ," +
                 "whiteUsername VARCHAR(255)," +
                 "blackUsername VARCHAR(255)," +
@@ -76,8 +74,7 @@ public class DatabaseManager {
 
         // Create the auths table
         statement = "CREATE TABLE IF NOT EXISTS auths (" +
-                "id INT NOT NULL PRIMARY KEY, " +
-                "authToken VARCHAR(255), " +
+                "authToken VARCHAR(255) PRIMARY KEY , " +
                 "username VARCHAR(255)" +
                 ")";
         try (var preparedStatement = conn.prepareStatement(statement)) {
