@@ -34,15 +34,54 @@ public class DatabaseManager {
     /**
      * Creates the database if it does not already exist.
      */
-    static void createDatabase() throws DataAccessException {
+    public static void createDatabase() throws DataAccessException, SQLException {
+        Connection conn;
+        String statement;
         try {
-            var statement = "CREATE DATABASE IF NOT EXISTS " + DATABASE_NAME;
-            var conn = DriverManager.getConnection(CONNECTION_URL, USER, PASSWORD);
+            statement = "CREATE DATABASE IF NOT EXISTS " + DATABASE_NAME;
+            conn = DriverManager.getConnection(CONNECTION_URL, USER, PASSWORD);
             try (var preparedStatement = conn.prepareStatement(statement)) {
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage());
+        }
+
+        conn.setCatalog(DATABASE_NAME);
+
+
+        // Create users table
+        statement = "CREATE TABLE IF NOT EXISTS users (" +
+                "id INT NOT NULL PRIMARY KEY, " +
+                "username VARCHAR(255), " +
+                "password VARCHAR(255), " +
+                "email VARCHAR(255)" +
+                ")";
+        try (var preparedStatement = conn.prepareStatement(statement)) {
+            preparedStatement.executeUpdate();
+        }
+
+        // Create the games table
+        statement = "CREATE TABLE IF NOT EXISTS games (" +
+                "id INT NOT NULL," +
+                "gameID VARCHAR(255) NOT NULL PRIMARY KEY ," +
+                "whiteUsername VARCHAR(255)," +
+                "blackUsername VARCHAR(255)," +
+                "gameName VARCHAR(255)," +
+                "game JSON" +
+                ")";
+        try (var preparedStatement = conn.prepareStatement(statement)) {
+            preparedStatement.executeUpdate();
+        }
+
+        // Create the auths table
+        statement = "CREATE TABLE IF NOT EXISTS auths (" +
+                "id INT NOT NULL PRIMARY KEY, " +
+                "authToken VARCHAR(255), " +
+                "username VARCHAR(255)" +
+                ")";
+        try (var preparedStatement = conn.prepareStatement(statement)) {
+            preparedStatement.executeUpdate();
         }
     }
 

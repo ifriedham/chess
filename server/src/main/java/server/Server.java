@@ -19,21 +19,21 @@ public class Server {
     private final GameService gameService = new GameService(auths, games);
     private final ClearService clearService = new ClearService(users, games, auths);
 
-
-    public static void main(String[] args) throws SQLException, DataAccessException {
+    public static void main(String[] args) {
         Server server = new Server();
-        server.initializeDB();
+        server.run(Integer.parseInt(args[0]));
     }
-
-    private void initializeDB() throws SQLException, DataAccessException {
-        MySqlDataAccess dataAccess = new MySqlDataAccess();
-    }
-
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
-
         Spark.staticFiles.location("web");
+
+        // Initialize the database
+        try {
+            DatabaseManager.createDatabase();
+        } catch (DataAccessException | SQLException e) {
+            throw new RuntimeException(e);
+        }
 
         // Register your endpoints and handle exceptions here.
         Spark.post("/user", this::registration);    // registration
