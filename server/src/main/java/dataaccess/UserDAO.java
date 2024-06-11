@@ -5,11 +5,11 @@ import model.UserData;
 import java.sql.SQLException;
 
 public interface UserDAO {
-    void createUser(UserData user) throws DataAccessException, SQLException;
+    void createUser(UserData user) throws DataAccessException;
 
-    UserData getUser(String username) throws DataAccessException, SQLException;
+    UserData getUser(String username) throws DataAccessException;
 
-    void removeAllUsers() throws DataAccessException, SQLException;
+    void removeAllUsers() throws DataAccessException;
 
-    boolean isEmpty() throws DataAccessException, SQLException;
+    boolean isEmpty() throws DataAccessException;
 }

@@ -4,7 +4,6 @@ import dataaccess.*;
 
 import model.GameData;
 
-import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Random;
@@ -14,15 +13,8 @@ public class GameService {
     private final GameDAO gameDAO;
 
     public GameService() {
-        // SQL DAOs by default
         this.authDAO = new SQLAuthDAO();
         this.gameDAO = new SQLGameDAO();
-    }
-
-    public GameService(AuthDAO authDAO, GameDAO gameDAO) {
-        // memory DAOs if they are given
-        this.authDAO = authDAO;
-        this.gameDAO = gameDAO;
     }
 
 
@@ -36,20 +28,12 @@ public class GameService {
         Integer gameID = generateID(gameName);
 
         // check if game with gameID already exists
-        try {
-            if (gameDAO.getGame(gameID) != null) {
-                throw new DataAccessException("game already exists");
-            }
-        } catch (SQLException e) {
-            throw new DataAccessException(e.getMessage());
+        if (gameDAO.getGame(gameID) != null) {
+            throw new DataAccessException("game already exists");
         }
 
         // create game and store in database, return gameID
-        try {
-            return gameDAO.createGame(gameName, gameID);
-        } catch (SQLException e) {
-            throw new DataAccessException(e.getMessage());
-        }
+        return gameDAO.createGame(gameName, gameID);
     }
 
     public Collection<GameData> listGames(String authToken) throws DataAccessException {
@@ -57,11 +41,7 @@ public class GameService {
         if (isValid(authToken)) throw new DataAccessException("unauthorized");
 
         // return a list of games
-        try {
-            return gameDAO.listGames();
-        } catch (SQLException e) {
-            throw new DataAccessException(e.getMessage());
-        }
+        return gameDAO.listGames();
     }
 
     public GameData joinGame(String authToken, String playerColor, Integer gameID) throws DataAccessException {
@@ -70,30 +50,18 @@ public class GameService {
 
         // get username from authToken
         String userName = null;
-        try {
-            userName = authDAO.getUsername(authToken);
-        } catch (SQLException e) {
-            throw new DataAccessException(e.getMessage());
-        }
+        userName = authDAO.getUsername(authToken);
 
         // check if game exists
         GameData game = null;
-        try {
-            game = gameDAO.getGame(gameID);
-        } catch (SQLException e) {
-            throw new DataAccessException(e.getMessage());
-        }
+        game = gameDAO.getGame(gameID);
         if (game == null) throw new DataAccessException("bad request");
 
         // update the game with the new player
         GameData updatedGame = updateGame(game, userName, playerColor);
 
         // save updated game to database
-        try {
-            return gameDAO.saveGame(gameID, updatedGame);
-        } catch (SQLException e) {
-            throw new DataAccessException(e.getMessage());
-        }
+        return gameDAO.saveGame(gameID, updatedGame);
     }
 
     private GameData updateGame(GameData game, String userName, String playerColor) throws DataAccessException {
@@ -122,10 +90,6 @@ public class GameService {
     }
 
     private boolean isValid(String authToken) throws DataAccessException {
-        try {
-            return authToken == null || authDAO.getAuth(authToken) == null;
-        } catch (SQLException e) {
-            throw new DataAccessException(e.getMessage());
-        }
+        return authToken == null || authDAO.getAuth(authToken) == null;
     }
 }

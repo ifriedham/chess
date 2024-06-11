@@ -22,10 +22,10 @@ public class Server {
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
+
         Spark.staticFiles.location("web");
 
         // Initialize the database
-
         DatabaseManager.createDatabase();
 
         // Register your endpoints and handle exceptions here.
@@ -164,16 +164,11 @@ public class Server {
 
     public Object errorHandler(Exception e, Response res) {
         String errorMessage = e.getMessage();
-        int statusCode = 0;
-        statusCode = switch (errorMessage) {
-            case "data not cleared.",
-                    "must fill all fields",
-                    "no account with that username found",
-                    "game already exists" -> 500;
+        int statusCode = switch (errorMessage) {
             case "bad request" -> 400;
             case "unauthorized" -> 401;
             case "already taken" -> 403;
-            default -> statusCode;
+            default -> 500;
         };
 
         var body = new Gson().toJson(Map.of("message", "Error: " + errorMessage));

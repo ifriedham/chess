@@ -34,51 +34,48 @@ public class DatabaseManager {
     /**
      * Creates the database if it does not already exist.
      */
-    public static void createDatabase() throws DataAccessException, SQLException {
-        Connection conn;
-        String statement;
+    public static void createDatabase() throws DataAccessException {
         try {
-            statement = "CREATE DATABASE IF NOT EXISTS " + DATABASE_NAME;
-            conn = DriverManager.getConnection(CONNECTION_URL, USER, PASSWORD);
+            var statement = "CREATE DATABASE IF NOT EXISTS " + DATABASE_NAME;
+            var conn = DriverManager.getConnection(CONNECTION_URL, USER, PASSWORD);
+            try (var preparedStatement = conn.prepareStatement(statement)) {
+                preparedStatement.executeUpdate();
+            }
+
+            conn.setCatalog(DATABASE_NAME);
+
+            // Create users table
+            statement = "CREATE TABLE IF NOT EXISTS users (" +
+                        "username VARCHAR(255) PRIMARY KEY , " +
+                        "password VARCHAR(255), " +
+                        "email VARCHAR(255)" +
+                        ")";
+            try (var preparedStatement = conn.prepareStatement(statement)) {
+                preparedStatement.executeUpdate();
+            }
+
+            // Create the games table
+            statement = "CREATE TABLE IF NOT EXISTS games (" +
+                        "gameID VARCHAR(255) NOT NULL PRIMARY KEY ," +
+                        "whiteUsername VARCHAR(255)," +
+                        "blackUsername VARCHAR(255)," +
+                        "gameName VARCHAR(255)," +
+                        "game longtext" +
+                        ")";
+            try (var preparedStatement = conn.prepareStatement(statement)) {
+                preparedStatement.executeUpdate();
+            }
+
+            // Create the auths table
+            statement = "CREATE TABLE IF NOT EXISTS auths (" +
+                        "authToken VARCHAR(255) PRIMARY KEY , " +
+                        "username VARCHAR(255)" +
+                        ")";
             try (var preparedStatement = conn.prepareStatement(statement)) {
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage());
-        }
-
-        conn.setCatalog(DATABASE_NAME);
-
-
-        // Create users table
-        statement = "CREATE TABLE IF NOT EXISTS users (" +
-                "username VARCHAR(255) PRIMARY KEY , " +
-                "password VARCHAR(255), " +
-                "email VARCHAR(255)" +
-                ")";
-        try (var preparedStatement = conn.prepareStatement(statement)) {
-            preparedStatement.executeUpdate();
-        }
-
-        // Create the games table
-        statement = "CREATE TABLE IF NOT EXISTS games (" +
-                "gameID VARCHAR(255) NOT NULL PRIMARY KEY ," +
-                "whiteUsername VARCHAR(255)," +
-                "blackUsername VARCHAR(255)," +
-                "gameName VARCHAR(255)," +
-                "game longtext" +
-                ")";
-        try (var preparedStatement = conn.prepareStatement(statement)) {
-            preparedStatement.executeUpdate();
-        }
-
-        // Create the auths table
-        statement = "CREATE TABLE IF NOT EXISTS auths (" +
-                "authToken VARCHAR(255) PRIMARY KEY , " +
-                "username VARCHAR(255)" +
-                ")";
-        try (var preparedStatement = conn.prepareStatement(statement)) {
-            preparedStatement.executeUpdate();
         }
     }
 
