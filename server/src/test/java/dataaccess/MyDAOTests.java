@@ -44,23 +44,7 @@ public class MyDAOTests {
 
 
         private void printUsersTable() throws SQLException {
-            try (Connection conn = getConnection()) {
-                try (Statement stmt = conn.createStatement();
-                     ResultSet rs = stmt.executeQuery("SELECT * FROM users")) {
 
-                    while (rs.next()) {
-                        System.out.println("Username: " + rs.getString("username") + ", Password: " + rs.getString("password") + ", Email: " + rs.getString("email"));
-                    }
-                }
-            }
-        }
-
-        private Connection getConnection() {
-            try {
-                return DatabaseManager.getConnection();
-            } catch (DataAccessException e) {
-                throw new RuntimeException(e);
-            }
         }
     }
 }

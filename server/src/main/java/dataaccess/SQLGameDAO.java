@@ -12,9 +12,8 @@ import java.util.List;
 
 public class SQLGameDAO implements GameDAO{
 
-
     @Override
-    public Integer createGame(String gameName, Integer gameID) throws DataAccessException {
+    public Integer createGame(String gameName, Integer gameID) throws SQLException, DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement("INSERT INTO games (gameID, whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?, ?)")) {
                 preparedStatement.setInt(1, gameID);
@@ -26,14 +25,12 @@ public class SQLGameDAO implements GameDAO{
 
                 preparedStatement.executeUpdate();
             }
-        } catch (SQLException e) {
-            throw new DataAccessException(e.getMessage());
         }
         return gameID;
     }
 
     @Override
-    public GameData getGame(Integer gameID) throws DataAccessException {
+    public GameData getGame(Integer gameID) throws SQLException, DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement("SELECT * FROM games WHERE gameID = ?")) {
                 preparedStatement.setInt(1, gameID);
@@ -45,13 +42,11 @@ public class SQLGameDAO implements GameDAO{
                     }
                 }
             }
-        } catch (SQLException e) {
-            throw new DataAccessException(e.getMessage());
         }
     }
 
     @Override
-    public Collection<GameData> listGames() throws DataAccessException {
+    public Collection<GameData> listGames() throws SQLException, DataAccessException {
         Collection<GameData> gameList = null;
         
         try (Connection conn = DatabaseManager.getConnection()) {
@@ -62,15 +57,13 @@ public class SQLGameDAO implements GameDAO{
                     }
                 }
             }
-        } catch (SQLException e) {
-            throw new DataAccessException(e.getMessage());
         }
 
         return gameList;
     }
 
     @Override
-    public GameData saveGame(int gameID, GameData game) throws DataAccessException {
+    public GameData saveGame(int gameID, GameData game) throws SQLException, DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement("UPDATE games SET whiteUsername = ?, blackUsername = ?, gameName = ?, game = ? WHERE gameID = ?")) {
                 preparedStatement.setInt(1, gameID);
@@ -83,34 +76,28 @@ public class SQLGameDAO implements GameDAO{
                 preparedStatement.executeUpdate();
                 return game;
             }
-        } catch (SQLException e) {
-            throw new DataAccessException(e.getMessage());
         }
     }
 
     @Override
-    public void removeAllGames() throws DataAccessException {
+    public void removeAllGames() throws SQLException, DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             // clear all data from games table
             //noinspection SqlWithoutWhere
             try (var statement = conn.prepareStatement("DELETE FROM games")) {
                 statement.executeUpdate();
             }
-        } catch (SQLException e) {
-            throw new DataAccessException(e.getMessage());
         }
     }
 
     @Override
-    public boolean isEmpty() throws DataAccessException {
+    public boolean isEmpty() throws SQLException, DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement("SELECT 1 FROM games LIMIT 1")) {
                 try (var resultSet = preparedStatement.executeQuery()) { // should return false if there isn't a row in the table
                     return !resultSet.next();
                 }
             }
-        } catch (SQLException e) {
-            throw new DataAccessException(e.getMessage());
         }
     }
 

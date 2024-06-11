@@ -4,6 +4,7 @@ import dataaccess.*;
 
 import model.GameData;
 
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Random;
@@ -13,7 +14,7 @@ public class GameService {
     private final GameDAO gameDAO = new SQLGameDAO();
 
 
-    public Integer createGame(String authToken, String gameName) throws DataAccessException {
+    public Integer createGame(String authToken, String gameName) throws SQLException, DataAccessException {
         // check if given authData is valid
         if (isValid(authToken)) throw new DataAccessException("unauthorized");
 
@@ -31,7 +32,7 @@ public class GameService {
         return gameDAO.createGame(gameName, gameID);
     }
 
-    public Collection<GameData> listGames(String authToken) throws DataAccessException {
+    public Collection<GameData> listGames(String authToken) throws SQLException, DataAccessException {
         // check if given authData is valid
         if (isValid(authToken)) throw new DataAccessException("unauthorized");
 
@@ -39,7 +40,7 @@ public class GameService {
         return gameDAO.listGames();
     }
 
-    public GameData joinGame(String authToken, String playerColor, Integer gameID) throws DataAccessException {
+    public GameData joinGame(String authToken, String playerColor, Integer gameID) throws SQLException, DataAccessException {
         // check if given authData is valid
         if (isValid(authToken)) throw new DataAccessException("unauthorized");
 
@@ -57,7 +58,7 @@ public class GameService {
         return gameDAO.saveGame(gameID, updatedGame);
     }
 
-    private GameData updateGame(GameData game, String userName, String playerColor) throws DataAccessException {
+    private GameData updateGame(GameData game, String userName, String playerColor) throws SQLException, DataAccessException {
         // check if playerColor is valid
         if (playerColor == null || (!playerColor.equals("WHITE") && !playerColor.equals("BLACK"))) {
             throw new DataAccessException("bad request");
@@ -82,7 +83,7 @@ public class GameService {
         return 1000 + generator.nextInt(9000);
     }
 
-    private boolean isValid(String authToken) throws DataAccessException {
+    private boolean isValid(String authToken) throws SQLException, DataAccessException {
         return authToken == null || authDAO.getAuth(authToken) == null;
     }
 }

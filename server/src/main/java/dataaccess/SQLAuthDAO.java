@@ -6,7 +6,7 @@ import java.util.UUID;
 
 public class SQLAuthDAO implements AuthDAO{
     @Override
-    public String createAuth(String username) throws DataAccessException {
+    public String createAuth(String username) throws SQLException, DataAccessException {
         String token;
         try (Connection conn = DatabaseManager.getConnection()) {
             try (var statement = conn.prepareStatement("INSERT INTO auths (authToken, username) VALUES (?, ?)")) {
@@ -18,8 +18,6 @@ public class SQLAuthDAO implements AuthDAO{
 
                 statement.executeUpdate();
             }
-        } catch (SQLException e) {
-            throw new DataAccessException(e.getMessage());
         }
 
         // return authToken
@@ -27,7 +25,7 @@ public class SQLAuthDAO implements AuthDAO{
     }
 
     @Override
-    public String getAuth(String authToken) throws DataAccessException {
+    public String getAuth(String authToken) throws SQLException, DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement("SELECT authToken FROM auths WHERE authToken = ?")) {
                 preparedStatement.setString(1, authToken);
@@ -39,13 +37,11 @@ public class SQLAuthDAO implements AuthDAO{
                     }
                 }
             }
-        } catch (SQLException e) {
-            throw new DataAccessException(e.getMessage());
         }
     }
 
     @Override
-    public String getUsername(String authToken) throws DataAccessException {
+    public String getUsername(String authToken) throws SQLException, DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement("SELECT username FROM auths WHERE authToken = ?")) {
                 preparedStatement.setString(1, authToken);
@@ -55,47 +51,39 @@ public class SQLAuthDAO implements AuthDAO{
                     }
                 }
             }
-        } catch (SQLException e) {
-            throw new DataAccessException(e.getMessage());
         }
         return null;
     }
 
     @Override
-    public void deleteAuth(String authToken) throws DataAccessException {
+    public void deleteAuth(String authToken) throws SQLException, DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement("DELETE FROM auths WHERE authToken = ?")) {
                 preparedStatement.setString(1, authToken);
                 preparedStatement.executeUpdate();
             }
-        } catch (SQLException e) {
-            throw new DataAccessException(e.getMessage());
         }
     }
 
     @Override
-    public void removeAllAuthTokens() throws DataAccessException {
+    public void removeAllAuthTokens() throws SQLException, DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             // clear all data from auths table
             //noinspection SqlWithoutWhere
             try (var statement = conn.prepareStatement("DELETE FROM auths")) {
                 statement.executeUpdate();
             }
-        } catch (SQLException e) {
-            throw new DataAccessException(e.getMessage());
         }
     }
 
     @Override
-    public boolean isEmpty() throws DataAccessException {
+    public boolean isEmpty() throws SQLException, DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement("SELECT 1 FROM auths LIMIT 1")) {
                 try (var resultSet = preparedStatement.executeQuery()) { // should return false if there isn't a row in the table
                     return !resultSet.next();
                 }
             }
-        } catch (SQLException e) {
-            throw new DataAccessException(e.getMessage());
         }
     }
 }
