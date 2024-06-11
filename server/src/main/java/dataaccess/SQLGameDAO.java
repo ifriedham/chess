@@ -13,7 +13,7 @@ import java.util.List;
 public class SQLGameDAO implements GameDAO{
 
     @Override
-    public Integer createGame(String gameName, Integer gameID) throws SQLException, DataAccessException {
+    public Integer createGame(String gameName, Integer gameID) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement("INSERT INTO games (gameID, whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?, ?)")) {
                 preparedStatement.setInt(1, gameID);
@@ -25,12 +25,14 @@ public class SQLGameDAO implements GameDAO{
 
                 preparedStatement.executeUpdate();
             }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
         }
         return gameID;
     }
 
     @Override
-    public GameData getGame(Integer gameID) throws SQLException, DataAccessException {
+    public GameData getGame(Integer gameID) throws  DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement("SELECT * FROM games WHERE gameID = ?")) {
                 preparedStatement.setInt(1, gameID);
@@ -42,11 +44,13 @@ public class SQLGameDAO implements GameDAO{
                     }
                 }
             }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
         }
     }
 
     @Override
-    public Collection<GameData> listGames() throws SQLException, DataAccessException {
+    public Collection<GameData> listGames() throws DataAccessException {
         Collection<GameData> gameList = new java.util.ArrayList<>(List.of()); // don't know why it needs to be this instead of null -_-
         
         try (Connection conn = DatabaseManager.getConnection()) {
@@ -57,15 +61,17 @@ public class SQLGameDAO implements GameDAO{
                     }
                 }
             }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
         }
 
         return gameList;
     }
 
     @Override
-    public GameData saveGame(int gameID, GameData game) throws SQLException, DataAccessException {
+    public GameData saveGame(int gameID, GameData game) throws DataAccessException {
         if (getGame(gameID) == null) {
-            throw new SQLException("Game does not exist");
+            throw new DataAccessException("Game does not exist");
         } else {
             try (Connection conn = DatabaseManager.getConnection()) {
                 try (var preparedStatement = conn.prepareStatement("UPDATE games SET whiteUsername = ?, blackUsername = ?, gameName = ?, game = ? WHERE gameID = ?")) {
@@ -79,29 +85,35 @@ public class SQLGameDAO implements GameDAO{
                     preparedStatement.executeUpdate();
                     return game;
                 }
+            } catch (SQLException e) {
+                throw new DataAccessException(e.getMessage());
             }
         }
     }
 
     @Override
-    public void removeAllGames() throws SQLException, DataAccessException {
+    public void removeAllGames() throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             // clear all data from games table
             //noinspection SqlWithoutWhere
             try (var statement = conn.prepareStatement("DELETE FROM games")) {
                 statement.executeUpdate();
             }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
         }
     }
 
     @Override
-    public boolean isEmpty() throws SQLException, DataAccessException {
+    public boolean isEmpty() throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement("SELECT 1 FROM games LIMIT 1")) {
                 try (var resultSet = preparedStatement.executeQuery()) { // should return false if there isn't a row in the table
                     return !resultSet.next();
                 }
             }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
         }
     }
 

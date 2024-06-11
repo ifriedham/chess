@@ -8,7 +8,7 @@ import java.sql.SQLException;
 public class SQLUserDAO implements UserDAO{
 
     @Override
-    public void createUser(UserData newUser) throws SQLException, DataAccessException {
+    public void createUser(UserData newUser) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             try (var statement = conn.prepareStatement("INSERT INTO users (username, password, email) VALUES (?, ?, ?)")) {
                 statement.setString(1, newUser.username());
@@ -17,11 +17,13 @@ public class SQLUserDAO implements UserDAO{
 
                 statement.executeUpdate();
             }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
         }
     }
 
     @Override
-    public UserData getUser(String username) throws SQLException, DataAccessException {
+    public UserData getUser(String username) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement("SELECT * FROM users WHERE username = ?")) {
                 preparedStatement.setString(1, username);
@@ -33,32 +35,37 @@ public class SQLUserDAO implements UserDAO{
                                 rs.getString("email")
                         );
                     } else {
-                        throw new SQLException("User not found");
+                        return null;
                     }
                 }
             }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
         }
     }
 
     @Override
-    public void removeAllUsers() throws SQLException, DataAccessException {
+    public void removeAllUsers() throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             // clear all data from users table
-            //noinspection SqlWithoutWhere
             try (var statement = conn.prepareStatement("DELETE FROM users")) {
                 statement.executeUpdate();
             }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
         }
     }
 
     @Override
-    public boolean isEmpty() throws SQLException, DataAccessException {
+    public boolean isEmpty() throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement("SELECT 1 FROM users LIMIT 1")) {
                 try (var resultSet = preparedStatement.executeQuery()) { // should return false if there isn't a row in the table
                     return !resultSet.next();
                 }
             }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
         }
     }
 }

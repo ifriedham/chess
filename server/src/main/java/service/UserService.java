@@ -18,11 +18,11 @@ public class UserService {
         this.authDAO = new SQLAuthDAO();
     }
 
-    public UserService(AuthDAO authDAO, UserDAO userDAO) {
+    /*public UserService(AuthDAO authDAO, UserDAO userDAO) {
         // memory DAOs if they are given
         this.userDAO = userDAO;
         this.authDAO = authDAO;
-    }
+    }*/
 
     public AuthData register(UserData user) throws DataAccessException {
 
@@ -109,7 +109,6 @@ public class UserService {
     }
 
     private boolean verifyPassword(String givenPassword, String savedHashedPassword) {
-
         return BCrypt.checkpw(givenPassword, savedHashedPassword);
     }
 

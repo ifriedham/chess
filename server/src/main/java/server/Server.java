@@ -11,10 +11,6 @@ import java.util.Collection;
 import java.util.Map;
 
 public class Server {
-//    private final UserDAO users = new SQLUserDAO();
-//    private final GameDAO games = new SQLGameDAO();
-//    private final AuthDAO auths = new SQLAuthDAO();
-
     private final UserService userService = new UserService();
     private final GameService gameService = new GameService();
     private final ClearService clearService = new ClearService();
@@ -29,11 +25,8 @@ public class Server {
         Spark.staticFiles.location("web");
 
         // Initialize the database
-        try {
-            DatabaseManager.createDatabase();
-        } catch (DataAccessException | SQLException e) {
-            throw new RuntimeException(e);
-        }
+
+        DatabaseManager.createDatabase();
 
         // Register your endpoints and handle exceptions here.
         Spark.post("/user", this::registration);    // registration
