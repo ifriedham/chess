@@ -13,8 +13,7 @@ public class SQLUserDAO implements UserDAO{
     public void createUser(UserData user) throws DataAccessException {
 
         try (Connection conn = DatabaseManager.getConnection()) {
-            String sql = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
-            try (var statement = conn.prepareStatement(sql)) {
+            try (var statement = conn.prepareStatement("INSERT INTO users (username, password, email) VALUES (?, ?, ?)")) {
                 // hash password first
                 String hashedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
 

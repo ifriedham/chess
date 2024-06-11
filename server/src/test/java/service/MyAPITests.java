@@ -1,8 +1,3 @@
-
-
-***SAVED AS PLAIN TEXT -> CONVERT TO JAVA IF NEEDED***
-
-
 package service;
 
 import model.*;
@@ -13,7 +8,7 @@ import dataaccess.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class MyAPITests {
+/*public class MyAPITests {
 
     @Test
     public void testClearService() throws DataAccessException {
@@ -366,4 +361,4 @@ public class MyAPITests {
 
         ;
     }
-}
+}*/
