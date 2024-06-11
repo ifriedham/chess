@@ -90,12 +90,28 @@ public class SQLGameDAO implements GameDAO{
 
     @Override
     public void removeAllGames() throws DataAccessException {
-
+        try (Connection conn = DatabaseManager.getConnection()) {
+            // clear all data from games table
+            //noinspection SqlWithoutWhere
+            try (var statement = conn.prepareStatement("DELETE FROM games")) {
+                statement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        }
     }
 
     @Override
     public boolean isEmpty() throws DataAccessException {
-        return false;
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement("SELECT 1 FROM games LIMIT 1")) {
+                try (var resultSet = preparedStatement.executeQuery()) { // should return false if there isn't a row in the table
+                    return !resultSet.next();
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        }
     }
 
     private GameData getGameData(ResultSet rs) throws SQLException {

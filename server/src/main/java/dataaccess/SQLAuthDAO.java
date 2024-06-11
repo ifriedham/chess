@@ -96,5 +96,6 @@ public class SQLAuthDAO implements AuthDAO{
             }
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage());
-        }    }
+        }
+    }
 }
