@@ -27,7 +27,12 @@ public class UserService {
         }
 
         // create user and store in database
-        userDAO.createUser(user);
+        try {
+            userDAO.createUser(user);
+        } catch (DataAccessException e) {
+            throw new DataAccessException("Database error");
+        }
+
         String username = user.username();
         String token = authDAO.createAuth(username);
 
