@@ -66,7 +66,7 @@ public class DatabaseManager {
                 "whiteUsername VARCHAR(255)," +
                 "blackUsername VARCHAR(255)," +
                 "gameName VARCHAR(255)," +
-                "game JSON" +
+                "game longtext" +
                 ")";
         try (var preparedStatement = conn.prepareStatement(statement)) {
             preparedStatement.executeUpdate();

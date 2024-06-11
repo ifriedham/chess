@@ -15,7 +15,7 @@ public class GameService {
 
     public Integer createGame(String authToken, String gameName) throws DataAccessException {
         // check if given authData is valid
-        if (!isValid(authToken)) throw new DataAccessException("unauthorized");
+        if (isValid(authToken)) throw new DataAccessException("unauthorized");
 
         if (gameName == null) throw new DataAccessException("bad request");
 
@@ -33,7 +33,7 @@ public class GameService {
 
     public Collection<GameData> listGames(String authToken) throws DataAccessException {
         // check if given authData is valid
-        if (!isValid(authToken)) throw new DataAccessException("unauthorized");
+        if (isValid(authToken)) throw new DataAccessException("unauthorized");
 
         // return a list of games
         return gameDAO.listGames();
@@ -41,7 +41,7 @@ public class GameService {
 
     public GameData joinGame(String authToken, String playerColor, Integer gameID) throws DataAccessException {
         // check if given authData is valid
-        if (!isValid(authToken)) throw new DataAccessException("unauthorized");
+        if (isValid(authToken)) throw new DataAccessException("unauthorized");
 
         // get username from authToken
         String userName = authDAO.getUsername(authToken);
@@ -83,8 +83,6 @@ public class GameService {
     }
 
     private boolean isValid(String authToken) throws DataAccessException {
-        if (authToken == null || authDAO.getAuth(authToken) == null) {
-            return false;
-        } else return true;
+        return authToken == null || authDAO.getAuth(authToken) == null;
     }
 }
