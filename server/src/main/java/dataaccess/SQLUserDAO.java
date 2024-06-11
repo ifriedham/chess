@@ -1,17 +1,14 @@
 package dataaccess;
 
 import model.UserData;
-import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 
 public class SQLUserDAO implements UserDAO{
 
-
     @Override
     public void createUser(UserData newUser) throws SQLException, DataAccessException {
-
         try (Connection conn = DatabaseManager.getConnection()) {
             try (var statement = conn.prepareStatement("INSERT INTO users (username, password, email) VALUES (?, ?, ?)")) {
                 statement.setString(1, newUser.username());
