@@ -5,25 +5,28 @@ import dataaccess.*;
 import java.sql.SQLException;
 
 public class ClearService {
-    private final UserDAO users = new SQLUserDAO();
-    private final GameDAO games = new SQLGameDAO();
-    private final AuthDAO auths = new SQLAuthDAO();
+    private final UserDAO users;
+    private final GameDAO games;
+    private final AuthDAO auths;
 
+    public ClearService() {
+        // SQL DAOs by default
+        this.users = new SQLUserDAO();
+        this.games = new SQLGameDAO();
+        this.auths = new SQLAuthDAO();
+    }
+
+    public ClearService(UserDAO users, GameDAO games, AuthDAO auths) {
+         // memory DAOs if they are given
+            this.users = users;
+            this.games = games;
+            this.auths = auths;
+    }
 
     public Object clear() throws DataAccessException {
         try {
             users.removeAllUsers();
-        } catch (SQLException e) {
-            throw new DataAccessException(e.getMessage());
-        }
-
-        try {
             games.removeAllGames();
-        } catch (SQLException e) {
-            throw new DataAccessException(e.getMessage());
-        }
-
-        try {
             auths.removeAllAuthTokens();
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage());
@@ -35,7 +38,7 @@ public class ClearService {
 
     private boolean clearStatus() throws DataAccessException {
         try {
-            return users.isEmpty() && games.isEmpty() && auths.isEmpty();
+            return users.isEmpty() && games.isEmpty() && auths.isEmpty(); // returns true if all are empty
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage());
         }

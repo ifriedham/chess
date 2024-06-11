@@ -4,14 +4,17 @@ import model.*;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import dataaccess.*;
+import org.mindrot.jbcrypt.BCrypt;
+
+import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-/*public class MyAPITests {
+public class MyAPITests {
 
     @Test
-    public void testClearService() throws DataAccessException {
+    public void testClearService() throws DataAccessException, SQLException {
         // make test DAOs
         UserDAO users = new MemoryUserDAO();
         GameDAO games = new MemoryGameDAO();
@@ -47,7 +50,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
         }
 
         @Test
-        public void testUsernameTaken() throws DataAccessException {
+        public void testUsernameTaken() throws DataAccessException, SQLException {
             UserDAO users = new MemoryUserDAO();
             AuthDAO auths = new MemoryAuthDAO();
 
@@ -78,12 +81,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
     @Nested
     class TestLogin {
         @Test
-        public void testBadPassword() throws DataAccessException {
+        public void testBadPassword() throws DataAccessException, SQLException {
             UserDAO users = new MemoryUserDAO();
             AuthDAO auths = new MemoryAuthDAO();
 
             // store a user with the username "testUser"
-            users.createUser(new UserData("testUser", "testPassword", "testEmail"));
+            users.createUser(new UserData("testUser", hashPW("testPassword"), "testEmail"));
 
             // run test here -> should throw exception "unauthorized"
             UserService userService = new UserService(auths, users);
@@ -94,12 +97,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
         }
 
         @Test
-        public void testBadUsername() throws DataAccessException {
+        public void testBadUsername() throws DataAccessException, SQLException {
             UserDAO users = new MemoryUserDAO();
             AuthDAO auths = new MemoryAuthDAO();
 
             // store a user with the username "testUser"
-            users.createUser(new UserData("testUser", "testPassword", "testEmail"));
+            users.createUser(new UserData("testUser", hashPW("testPassword"), "testEmail"));
 
             // run test here -> should throw exception "unauthorized"
             UserService userService = new UserService(auths, users);
@@ -110,12 +113,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
         }
 
         @Test
-        public void testEmptyFields() throws DataAccessException {
+        public void testEmptyFields() throws DataAccessException, SQLException {
             UserDAO users = new MemoryUserDAO();
             AuthDAO auths = new MemoryAuthDAO();
 
             // store a user with the username "testUser"
-            users.createUser(new UserData("testUser", "testPassword", "testEmail"));
+            users.createUser(new UserData("testUser", hashPW("testPassword"), "testEmail"));
 
             // run test here -> should throw exception "must fill all fields"
             UserService userService = new UserService(auths, users);
@@ -126,12 +129,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
         }
 
         @Test
-        public void testLoginSuccess() throws DataAccessException {
+        public void testLoginSuccess() throws DataAccessException, SQLException {
             UserDAO users = new MemoryUserDAO();
             AuthDAO auths = new MemoryAuthDAO();
 
             // store a user with the username "testUser"
-            users.createUser(new UserData("testUser", "testPassword", "testEmail"));
+            users.createUser(new UserData("testUser", hashPW("testPassword"), "testEmail"));
 
             // run test here -> should return an AuthData object
             UserService userService = new UserService(auths, users);
@@ -139,6 +142,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
             System.out.println("AuthData: " + testAuthData);
         }
 
+    }
+
+    private String hashPW(String password) {
+        return BCrypt.hashpw(password, BCrypt.gensalt());
     }
 
     @Nested
@@ -361,4 +368,4 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
         ;
     }
-}*/
+}

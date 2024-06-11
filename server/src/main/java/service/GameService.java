@@ -10,8 +10,20 @@ import java.util.Objects;
 import java.util.Random;
 
 public class GameService {
-    private final AuthDAO authDAO = new SQLAuthDAO();
-    private final GameDAO gameDAO = new SQLGameDAO();
+    private final AuthDAO authDAO;
+    private final GameDAO gameDAO;
+
+    public GameService() {
+        // SQL DAOs by default
+        this.authDAO = new SQLAuthDAO();
+        this.gameDAO = new SQLGameDAO();
+    }
+
+    public GameService(AuthDAO authDAO, GameDAO gameDAO) {
+        // memory DAOs if they are given
+        this.authDAO = authDAO;
+        this.gameDAO = gameDAO;
+    }
 
 
     public Integer createGame(String authToken, String gameName) throws DataAccessException {

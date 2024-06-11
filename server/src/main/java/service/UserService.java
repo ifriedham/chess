@@ -9,8 +9,20 @@ import java.sql.SQLException;
 
 
 public class UserService {
-    private final UserDAO userDAO = new SQLUserDAO();
-    private final AuthDAO authDAO = new SQLAuthDAO();
+    private final UserDAO userDAO;
+    private final AuthDAO authDAO;
+
+    public UserService() {
+        // SQL DAOs by default
+        this.userDAO = new SQLUserDAO();
+        this.authDAO = new SQLAuthDAO();
+    }
+
+    public UserService(AuthDAO authDAO, UserDAO userDAO) {
+        // memory DAOs if they are given
+        this.userDAO = userDAO;
+        this.authDAO = authDAO;
+    }
 
     public AuthData register(UserData user) throws DataAccessException {
 
@@ -30,21 +42,21 @@ public class UserService {
 
         // create user and store in database
         try {
-            userDAO.createUser(user);
-        } catch (DataAccessException | SQLException e) {
-            throw new DataAccessException("Database error");
-        }
+            String username = user.username();
+            String hashedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt()); // hash password before storing
+            String email = user.email();
 
-        String username = user.username();
-        String token = null;
-        try {
-            token = authDAO.createAuth(username);
-        } catch (SQLException e) {
+            UserData newUser = new UserData(username, hashedPassword, email);
+
+            userDAO.createUser(newUser); // store user in database
+
+            String token = authDAO.createAuth(username); // get auth token for user
+
+            // registration successful, returning AuthData object
+            return new AuthData(token, username);
+        } catch (DataAccessException | SQLException e) {
             throw new DataAccessException(e.getMessage());
         }
-
-        // registration successful, returning AuthData object
-        return new AuthData(token, username);
     }
 
     public AuthData login(UserData loginData) throws DataAccessException {
@@ -53,29 +65,25 @@ public class UserService {
             throw new DataAccessException("must fill all fields");
         }
 
-        // check for bad username
         try {
+            // check for bad username
             if (userDAO.getUser(loginData.username()) == null) {
                 throw new DataAccessException("unauthorized");
             }
-        } catch (SQLException e) {
-            throw new DataAccessException(e.getMessage());
-        }
 
-        // check if given password matches the one in the database
-        UserData savedUser = null;
-        try {
-            savedUser = userDAO.getUser(loginData.username());
-        } catch (SQLException e) {
-            throw new DataAccessException(e.getMessage());
-        }
-        if (!verifyPassword(loginData.password(), savedUser.password())) {
-            throw new DataAccessException("unauthorized");
-        }
+            // check if given password matches the one in the database
+            String username = loginData.username();
 
-        // correct login info given, returning AuthData object
-        try {
-            return new AuthData(authDAO.createAuth(loginData.username()), loginData.username());
+            UserData savedUser = userDAO.getUser(username);
+            String givenPassword = loginData.password();
+            String savedPassword = savedUser.password(); // should return hashed password
+            if (!verifyPassword(givenPassword, savedPassword)) {
+                throw new DataAccessException("unauthorized");
+            }
+
+            // correct password given, create and return auth token
+            String token = authDAO.createAuth(username);
+            return new AuthData(token, username);
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage());
         }
@@ -101,6 +109,7 @@ public class UserService {
     }
 
     private boolean verifyPassword(String givenPassword, String savedHashedPassword) {
+
         return BCrypt.checkpw(givenPassword, savedHashedPassword);
     }
 
