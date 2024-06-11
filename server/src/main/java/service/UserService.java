@@ -1,19 +1,13 @@
 package service;
 
-
 import dataaccess.*;
 import model.AuthData;
 import model.UserData;
 
 
 public class UserService {
-    private final AuthDAO authDAO;
-    private final UserDAO userDAO;
-
-    public UserService(AuthDAO authDAO, UserDAO userDAO) {
-        this.authDAO = authDAO;
-        this.userDAO = userDAO;
-    }
+    private final UserDAO userDAO = new SQLUserDAO();
+    private final AuthDAO authDAO = new SQLAuthDAO();
 
     public AuthData register(UserData user) throws DataAccessException {
         // test if all fields are filled

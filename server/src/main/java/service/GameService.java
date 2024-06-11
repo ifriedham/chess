@@ -1,8 +1,6 @@
 package service;
 
-import dataaccess.AuthDAO;
-import dataaccess.DataAccessException;
-import dataaccess.GameDAO;
+import dataaccess.*;
 
 import model.GameData;
 
@@ -11,13 +9,9 @@ import java.util.Objects;
 import java.util.Random;
 
 public class GameService {
-    private final AuthDAO authDAO;
-    private final GameDAO gameDAO;
+    private final AuthDAO authDAO = new SQLAuthDAO();
+    private final GameDAO gameDAO = new SQLGameDAO();
 
-    public GameService(AuthDAO authDAO, GameDAO gameDAO) {
-        this.authDAO = authDAO;
-        this.gameDAO = gameDAO;
-    }
 
     public Integer createGame(String authToken, String gameName) throws DataAccessException {
         // check if given authData is valid
