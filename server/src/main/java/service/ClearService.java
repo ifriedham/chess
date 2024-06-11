@@ -10,17 +10,35 @@ public class ClearService {
     private final AuthDAO auths = new SQLAuthDAO();
 
 
-    public Object clear() throws SQLException, DataAccessException {
-        users.removeAllUsers();
-        games.removeAllGames();
-        auths.removeAllAuthTokens();
+    public Object clear() throws DataAccessException {
+        try {
+            users.removeAllUsers();
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        }
+
+        try {
+            games.removeAllGames();
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        }
+
+        try {
+            auths.removeAllAuthTokens();
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        }
 
         if (clearStatus()) return null;
         else throw new DataAccessException("data not cleared.");
     }
 
-    private boolean clearStatus() throws SQLException, DataAccessException {
-        return users.isEmpty() && games.isEmpty() && auths.isEmpty();
+    private boolean clearStatus() throws DataAccessException {
+        try {
+            return users.isEmpty() && games.isEmpty() && auths.isEmpty();
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        }
     }
 
 }

@@ -62,7 +62,7 @@ public class Server {
             var body = serializer.toJson(Map.of("username", result.username(), "authToken", result.authToken()));
             res.body(body);
             return body;
-        } catch (DataAccessException | SQLException e) {
+        } catch (DataAccessException e) {
             return errorHandler(e, res);
         }
     }
@@ -78,7 +78,7 @@ public class Server {
             var body = serializer.toJson(Map.of("username", result.username(), "authToken", result.authToken()));
             res.body(body);
             return body;
-        } catch (DataAccessException | SQLException e) {
+        } catch (DataAccessException e) {
             return errorHandler(e, res);
         }
     }
@@ -94,7 +94,7 @@ public class Server {
             res.body(body);
             return body;
 
-        } catch (DataAccessException | SQLException e) {
+        } catch (DataAccessException e) {
             return errorHandler(e, res);
         }
     }
@@ -110,7 +110,7 @@ public class Server {
             res.body(body);
             return body;
 
-        } catch (DataAccessException | SQLException e) {
+        } catch (DataAccessException e) {
             return errorHandler(e, res);
         }
     }
@@ -129,7 +129,7 @@ public class Server {
             res.body(body);
             return body;
 
-        } catch (DataAccessException | SQLException e) {
+        } catch (DataAccessException e) {
             return errorHandler(e, res);
         }
     }
@@ -162,7 +162,7 @@ public class Server {
             res.body("{}");
 
             return "{}";
-        } catch (DataAccessException | SQLException e) {
+        } catch (DataAccessException e) {
             return errorHandler(e, res);
         }
     }
