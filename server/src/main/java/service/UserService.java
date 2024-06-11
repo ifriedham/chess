@@ -3,6 +3,7 @@ package service;
 import dataaccess.*;
 import model.AuthData;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 
 
 public class UserService {
@@ -66,10 +67,8 @@ public class UserService {
         return authDAO.getAuth(authToken) == null;
     }
 
-    private boolean verifyPassword(String givenPassword, String savedPassword) {
-        /* FIGURE OUT HOW TO COMPARE THE PASSWORD TO A HASH */
-
-        return givenPassword.equals(savedPassword);
+    private boolean verifyPassword(String givenPassword, String savedHashedPassword) {
+        return BCrypt.checkpw(givenPassword, savedHashedPassword);
     }
 
     private boolean verifyAuth(String authToken) throws DataAccessException {
