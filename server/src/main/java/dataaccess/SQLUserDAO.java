@@ -54,6 +54,7 @@ public class SQLUserDAO implements UserDAO{
     public void removeAllUsers() throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             // clear all data from users table
+            //noinspection SqlWithoutWhere
             try (var statement = conn.prepareStatement("DELETE FROM users")) {
                 statement.executeUpdate();
             }
@@ -65,8 +66,8 @@ public class SQLUserDAO implements UserDAO{
     @Override
     public boolean isEmpty() throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
-            try (var statement = conn.prepareStatement("SELECT 1 FROM users LIMIT 1")) {
-                try (var resultSet = statement.executeQuery()) { // should return false if there isn't a row in the table
+            try (var preparedStatement = conn.prepareStatement("SELECT 1 FROM users LIMIT 1")) {
+                try (var resultSet = preparedStatement.executeQuery()) { // should return false if there isn't a row in the table
                     return !resultSet.next();
                 }
             }

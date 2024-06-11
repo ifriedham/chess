@@ -1,7 +1,5 @@
 package dataaccess;
 
-import model.UserData;
-
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.UUID;
@@ -77,11 +75,26 @@ public class SQLAuthDAO implements AuthDAO{
 
     @Override
     public void removeAllAuthTokens() throws DataAccessException {
-
+        try (Connection conn = DatabaseManager.getConnection()) {
+            // clear all data from auths table
+            //noinspection SqlWithoutWhere
+            try (var statement = conn.prepareStatement("DELETE FROM auths")) {
+                statement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        }
     }
 
     @Override
     public boolean isEmpty() throws DataAccessException {
-        return false;
-    }
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement("SELECT 1 FROM auths LIMIT 1")) {
+                try (var resultSet = preparedStatement.executeQuery()) { // should return false if there isn't a row in the table
+                    return !resultSet.next();
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        }    }
 }
