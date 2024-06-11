@@ -52,22 +52,36 @@ public class GameService {
         }
     }
 
-    public GameData joinGame(String authToken, String playerColor, Integer gameID) throws SQLException, DataAccessException {
+    public GameData joinGame(String authToken, String playerColor, Integer gameID) throws DataAccessException {
         // check if given authData is valid
         if (isValid(authToken)) throw new DataAccessException("unauthorized");
 
         // get username from authToken
-        String userName = authDAO.getUsername(authToken);
+        String userName = null;
+        try {
+            userName = authDAO.getUsername(authToken);
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        }
 
         // check if game exists
-        GameData game = gameDAO.getGame(gameID);
+        GameData game = null;
+        try {
+            game = gameDAO.getGame(gameID);
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        }
         if (game == null) throw new DataAccessException("bad request");
 
         // update the game with the new player
         GameData updatedGame = updateGame(game, userName, playerColor);
 
         // save updated game to database
-        return gameDAO.saveGame(gameID, updatedGame);
+        try {
+            return gameDAO.saveGame(gameID, updatedGame);
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        }
     }
 
     private GameData updateGame(GameData game, String userName, String playerColor) throws DataAccessException {

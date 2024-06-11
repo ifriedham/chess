@@ -149,7 +149,7 @@ public class Server {
             res.body(body);
             return body;
 
-        } catch (DataAccessException | SQLException e) {
+        } catch (DataAccessException e) {
             return errorHandler(e, res);
         }
     }
