@@ -6,22 +6,20 @@ import java.util.UUID;
 
 public class SQLAuthDAO implements AuthDAO{
     @Override
-    public String createAuth(String username) throws SQLException, DataAccessException {
-        String token;
+    public String createAuth(String username) throws SQLException, DataAccessException { // Assumes that the username is valid (no token given for them yet)
         try (Connection conn = DatabaseManager.getConnection()) {
             try (var statement = conn.prepareStatement("INSERT INTO auths (authToken, username) VALUES (?, ?)")) {
                 // create token from username
-                token = UUID.randomUUID().toString();
+                String token = UUID.randomUUID().toString();
 
                 statement.setString(1, token);
                 statement.setString(2, username);
 
                 statement.executeUpdate();
+
+                return token;
             }
         }
-
-        // return authToken
-        return token;
     }
 
     @Override
@@ -69,7 +67,6 @@ public class SQLAuthDAO implements AuthDAO{
     public void removeAllAuthTokens() throws SQLException, DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             // clear all data from auths table
-            //noinspection SqlWithoutWhere
             try (var statement = conn.prepareStatement("DELETE FROM auths")) {
                 statement.executeUpdate();
             }

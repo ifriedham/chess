@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.List;
 
 public class SQLGameDAO implements GameDAO{
 
@@ -46,7 +47,7 @@ public class SQLGameDAO implements GameDAO{
 
     @Override
     public Collection<GameData> listGames() throws SQLException, DataAccessException {
-        Collection<GameData> gameList = null;
+        Collection<GameData> gameList = new java.util.ArrayList<>(List.of()); // don't know why it needs to be this instead of null -_-
         
         try (Connection conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement("SELECT * FROM games")) {
@@ -63,17 +64,21 @@ public class SQLGameDAO implements GameDAO{
 
     @Override
     public GameData saveGame(int gameID, GameData game) throws SQLException, DataAccessException {
-        try (Connection conn = DatabaseManager.getConnection()) {
-            try (var preparedStatement = conn.prepareStatement("UPDATE games SET whiteUsername = ?, blackUsername = ?, gameName = ?, game = ? WHERE gameID = ?")) {
-                preparedStatement.setInt(1, gameID);
-                preparedStatement.setString(2, game.whiteUsername());
-                preparedStatement.setString(3, game.blackUsername());
-                preparedStatement.setString(4, game.gameName());
-                var gameJson = new Gson().toJson(game); // serialize game
-                preparedStatement.setString(5, gameJson);
+        if (getGame(gameID) == null) {
+            throw new SQLException("Game does not exist");
+        } else {
+            try (Connection conn = DatabaseManager.getConnection()) {
+                try (var preparedStatement = conn.prepareStatement("UPDATE games SET whiteUsername = ?, blackUsername = ?, gameName = ?, game = ? WHERE gameID = ?")) {
+                    preparedStatement.setInt(1, gameID);
+                    preparedStatement.setString(2, game.whiteUsername());
+                    preparedStatement.setString(3, game.blackUsername());
+                    preparedStatement.setString(4, game.gameName());
+                    var gameJson = new Gson().toJson(game); // serialize game
+                    preparedStatement.setString(5, gameJson);
 
-                preparedStatement.executeUpdate();
-                return game;
+                    preparedStatement.executeUpdate();
+                    return game;
+                }
             }
         }
     }

@@ -1,5 +1,6 @@
 package dataaccess;
 
+import chess.ChessGame;
 import model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -7,6 +8,8 @@ import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;
 import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.Collection;
 
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -79,7 +82,7 @@ public class MyDatabaseTests {
             }
 
             @Test
-            public void testGetUserFailure() throws DataAccessException, SQLException {
+            public void testGetUserFailure() {
                 // attempt to retrieve a non-existent user
                 assertThrows(SQLException.class, () -> userDAO.getUser("nonexistentUser"));
             }
@@ -110,7 +113,11 @@ public class MyDatabaseTests {
 
             @Test
             public void testCreateGameFailure() throws DataAccessException, SQLException {
+                // create and store a game
+                gameDAO.createGame("testGame", 1);
 
+                // attempt to create the same game again
+                assertThrows(SQLException.class, () -> gameDAO.createGame("testGame", 1));
             }
         }
 
@@ -119,12 +126,20 @@ public class MyDatabaseTests {
 
             @Test
             public void testGetGameSuccess() throws DataAccessException, SQLException {
+                // create and store a game
+                GameData newGame = new GameData(1, null, null, "testGame", new ChessGame());
+                gameDAO.createGame(newGame.gameName(), newGame.gameID());
 
+                // attempt to get game from db
+                GameData savedGame = gameDAO.getGame(newGame.gameID());
+                assertEquals(newGame.gameName(), savedGame.gameName(), "GetGame failure");
             }
 
             @Test
             public void testGetGameFailure() throws DataAccessException, SQLException {
-
+                // attempt to get a non-existent game
+                GameData badGame = gameDAO.getGame(3);
+                assertNull(badGame, "returned null");
             }
         }
 
@@ -133,12 +148,35 @@ public class MyDatabaseTests {
 
             @Test
             public void testListGamesSuccess() throws DataAccessException, SQLException {
+                // create and store three games
+                GameData game1 = new GameData(1, null, null, "testGame1", new ChessGame());
+                GameData game2 = new GameData(2, null, null, "testGame2", new ChessGame());
+                GameData game3 = new GameData(3, null, null, "testGame3", new ChessGame());
 
+                gameDAO.createGame(game1.gameName(), game1.gameID());
+                gameDAO.createGame(game2.gameName(), game2.gameID());
+                gameDAO.createGame(game3.gameName(), game3.gameID());
+
+                // create the expected list of games
+                Collection<GameData> expectedGames = new ArrayList<>();
+                expectedGames.add(game1);
+                expectedGames.add(game2);
+                expectedGames.add(game3);
+
+                // check that the retrieved list matches the expected list
+                assertEquals(expectedGames.size(), gameDAO.listGames().size(), "List of games does not match expected list");
             }
 
             @Test
             public void testListGamesFailure() throws DataAccessException, SQLException {
+                // clear the games table
+                gameDAO.removeAllGames();
 
+                // attempt to list games
+                Collection<GameData> retrievedGames = gameDAO.listGames();
+
+                // check that the retrieved list is empty
+                assertTrue(retrievedGames.isEmpty(), "List of games is not empty");
             }
         }
 
@@ -147,12 +185,25 @@ public class MyDatabaseTests {
 
             @Test
             public void testSaveGameSuccess() throws DataAccessException, SQLException {
+                // create and store game
+                GameData game = new GameData(1, null, null, "testGame", new ChessGame());
+                gameDAO.createGame(game.gameName(), game.gameID());
 
+                // create a modified game with same gameID and name + new players
+                GameData newGame = new GameData(1, "testWhite", "testBlack", "testGame", new ChessGame());
+
+                // attempt to save the game
+                gameDAO.saveGame(newGame.gameID(), newGame);
+
+                // check that the retrieved game matches the saved game
+                assertEquals(newGame.gameName(), gameDAO.getGame(newGame.gameID()).gameName(), "Game name does not match");
             }
 
             @Test
-            public void testSaveGameFailure() throws DataAccessException, SQLException {
-
+            public void testSaveGameFailure() {
+                // attempt to save non-existent game
+                GameData badGame = new GameData(4, null, null, "badGame", new ChessGame());
+                assertThrows(SQLException.class, () -> gameDAO.saveGame(badGame.gameID(), badGame));
             }
         }
     }
@@ -160,56 +211,78 @@ public class MyDatabaseTests {
     @Nested
     class TestAuthMethods {
 
+
         @Nested
         class CreateAuthTests {
-
             @Test
-            public void testCreateAuthSuccess() {
+            public void testCreateAuthSuccess() throws DataAccessException, SQLException {
+                // create and store auth
+                String token = authDAO.createAuth("testUser");
 
+                // check if an auth token is returned
+                assertNotNull(token, "Auth token was not created");
             }
 
-            @Test
-            public void testCreateAuthFailure() {
-
-            }
+            // No need for negative test case, as createAuth() is only called internally,
+            // having already been tested for bad input in UserService.java
         }
 
         @Nested
         class GetAuthTests {
-
             @Test
-            public void testGetAuthSuccess() {
+            public void testGetAuthSuccess() throws DataAccessException, SQLException {
+                // create and store auth
+                String token = authDAO.createAuth("testUser");
 
+                // retrieve the auth
+                String retrievedAuth = authDAO.getAuth(token);
+
+                // check that the retrieved auth matches the created auth
+                assertEquals(token, retrievedAuth, "auths do not match");
             }
 
             @Test
-            public void testGetAuthFailure() {
+            public void testGetAuthFailure() throws DataAccessException, SQLException {
+                // attempt to retrieve a non-existent auth
+                String badAuth = authDAO.getAuth("bad token");
+                assertNull(badAuth, "returned null");
 
             }
         }
 
         @Nested
         class GetUsernameTests {
-
             @Test
-            public void testGetUsernameSuccess() {
+            public void testGetUsernameSuccess() throws DataAccessException, SQLException {
+                // create and store auth
+                String token = authDAO.createAuth("testUser");
 
+                // retrieve the username
+                String retrievedUsername = authDAO.getUsername(token);
+
+                // check that the retrieved username matches the created username
+                assertEquals("testUser", retrievedUsername, "Username does not match");
             }
 
             @Test
-            public void testGetUsernameFailure() {
-
+            public void testGetUsernameFailure() throws DataAccessException, SQLException {
+                // attempt to retrieve a non-existent username
+                String badUsername = authDAO.getUsername("nonexistentUser");
+                assertNull(badUsername, "returned null");
             }
         }
 
         @Test
-        public void testDeleteAuth() {
+        public void testDeleteAuth() throws DataAccessException, SQLException {
+            // create and store auth
+            String token = authDAO.createAuth("testUser");
 
-        }
+            // delete the auth
+            authDAO.deleteAuth(token);
 
-        @Test
-        public void testIsEmpty() {
-
+            // attempt to retrieve the deleted auth
+            String badAuth = authDAO.getAuth(token);
+            assertNull(badAuth, "returned null");
         }
     }
 

@@ -5,7 +5,6 @@ import model.GameData;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.UUID;
 
 public class MemoryGameDAO implements GameDAO {
     private HashMap<Integer, GameData> games;
@@ -42,7 +41,5 @@ public class MemoryGameDAO implements GameDAO {
         games.clear();
     }
 
-    public boolean isEmpty() {
-        return games.isEmpty();
-    }
+    public boolean isEmpty() {return games.isEmpty(); }
 }
