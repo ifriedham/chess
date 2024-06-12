@@ -69,7 +69,7 @@ public class SQLGameDAO implements GameDAO{
     }
 
     @Override
-    public void saveGame(int ID, GameData game) throws DataAccessException {
+    public void saveGame(int id, GameData game) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement("UPDATE games SET whiteUsername = ?, blackUsername = ?, gameName = ?, game = ? WHERE gameID = ?")) {
                 preparedStatement.setString(1, game.whiteUsername());
@@ -77,7 +77,7 @@ public class SQLGameDAO implements GameDAO{
                 preparedStatement.setString(3, game.gameName());
                 var gameJson = new Gson().toJson(game); // serialize game
                 preparedStatement.setString(4, gameJson);
-                preparedStatement.setInt(5, ID);
+                preparedStatement.setInt(5, id);
 
                 preparedStatement.executeUpdate();
             }
