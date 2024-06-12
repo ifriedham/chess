@@ -26,7 +26,11 @@ public class Server {
         Spark.staticFiles.location("web");
 
         // Initialize the database
-        DatabaseManager.createDatabase();
+        try {
+            DatabaseManager.createDatabase();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
 
         // Register your endpoints and handle exceptions here.
         Spark.post("/user", this::registration);    // registration
