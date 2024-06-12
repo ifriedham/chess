@@ -82,9 +82,14 @@ public class MyDatabaseTests {
             }
 
             @Test
-            public void testGetUserFailure() {
-                // attempt to retrieve a non-existent user
-                assertThrows(DataAccessException.class, () -> userDAO.getUser("nonexistentUser"));
+            public void testGetUserFailure() throws DataAccessException {
+                // create and store user
+                UserData newUser = new UserData("testUser", "testPassword", "testEmail");
+                userDAO.createUser(newUser);
+
+                // attempt to retrieve a different user
+                assertNull(userDAO.getUser("badUser"));
+
             }
         }
     }
@@ -200,10 +205,11 @@ public class MyDatabaseTests {
             }
 
             @Test
-            public void testSaveGameFailure() {
+            public void testSaveGameFailure() throws DataAccessException {
                 // attempt to save non-existent game
                 GameData badGame = new GameData(9999, null, null, "badGame", new ChessGame());
-                assertThrows(DataAccessException.class, () -> gameDAO.saveGame(badGame.gameID(), badGame));
+                gameDAO.saveGame(badGame.gameID(), badGame);
+                assertNull(gameDAO.getGame(badGame.gameID()), "Game not saved");
             }
         }
     }
@@ -215,7 +221,7 @@ public class MyDatabaseTests {
         @Nested
         class CreateAuthTests {
             @Test
-            public void testCreateAuthSuccess() throws DataAccessException, SQLException {
+            public void testCreateAuthSuccess() throws DataAccessException {
                 // create and store auth
                 String token = authDAO.createAuth("testUser");
 
