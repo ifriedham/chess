@@ -82,7 +82,7 @@ public class UserService {
         }
 
         // return true if logout is successful
-        if ( authDAO.getAuth(authToken) == null) throw new DataAccessException("logout failed");
+        if ( authDAO.getAuth(authToken) != null) throw new DataAccessException("logout failed");
     }
 
     private boolean verifyPassword(String givenPassword, String savedHashedPassword) {

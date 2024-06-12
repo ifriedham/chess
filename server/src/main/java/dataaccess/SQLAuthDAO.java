@@ -31,8 +31,10 @@ public class SQLAuthDAO implements AuthDAO{
                 preparedStatement.setString(1, authToken);
                 try (var rs = preparedStatement.executeQuery()) {
                     if (rs.next()) {
+                        // authToken found
                         return rs.getString("authToken");
                     } else {
+                        // authToken not found, returning null
                         return null;
                     }
                 }

@@ -69,25 +69,20 @@ public class SQLGameDAO implements GameDAO{
     }
 
     @Override
-    public GameData saveGame(int gameID, GameData game) throws DataAccessException {
-        if (getGame(gameID) == null) {
-            throw new DataAccessException("Game does not exist");
-        } else {
-            try (Connection conn = DatabaseManager.getConnection()) {
-                try (var preparedStatement = conn.prepareStatement("UPDATE games SET whiteUsername = ?, blackUsername = ?, gameName = ?, game = ? WHERE gameID = ?")) {
-                    preparedStatement.setInt(1, gameID);
-                    preparedStatement.setString(2, game.whiteUsername());
-                    preparedStatement.setString(3, game.blackUsername());
-                    preparedStatement.setString(4, game.gameName());
-                    var gameJson = new Gson().toJson(game); // serialize game
-                    preparedStatement.setString(5, gameJson);
+    public void saveGame(int ID, GameData game) throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement("UPDATE games SET whiteUsername = ?, blackUsername = ?, gameName = ?, game = ? WHERE gameID = ?")) {
+                preparedStatement.setString(1, game.whiteUsername());
+                preparedStatement.setString(2, game.blackUsername());
+                preparedStatement.setString(3, game.gameName());
+                var gameJson = new Gson().toJson(game); // serialize game
+                preparedStatement.setString(4, gameJson);
+                preparedStatement.setInt(5, ID);
 
-                    preparedStatement.executeUpdate();
-                    return game;
-                }
-            } catch (SQLException e) {
-                throw new DataAccessException(e.getMessage());
+                preparedStatement.executeUpdate();
             }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
         }
     }
 

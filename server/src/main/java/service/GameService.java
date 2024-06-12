@@ -20,7 +20,7 @@ public class GameService {
 
     public Integer createGame(String authToken, String gameName) throws DataAccessException {
         // check if given authData is valid
-        if (isValid(authToken)) throw new DataAccessException("unauthorized");
+        if (!isValid(authToken)) throw new DataAccessException("unauthorized");
 
         if (gameName == null) throw new DataAccessException("bad request");
 
@@ -38,48 +38,47 @@ public class GameService {
 
     public Collection<GameData> listGames(String authToken) throws DataAccessException {
         // check if given authData is valid
-        if (isValid(authToken)) throw new DataAccessException("unauthorized");
+        if (!isValid(authToken)) throw new DataAccessException("unauthorized");
 
         // return a list of games
         return gameDAO.listGames();
     }
 
-    public GameData joinGame(String authToken, String playerColor, Integer gameID) throws DataAccessException {
+    public void joinGame(String authToken, String playerColor, Integer gameID) throws DataAccessException {
         // check if given authData is valid
-        if (isValid(authToken)) throw new DataAccessException("unauthorized");
+        if (!isValid(authToken)) throw new DataAccessException("unauthorized");
 
-        // get username from authToken
-        String userName = null;
-        userName = authDAO.getUsername(authToken);
+        // check if gameID is valid
+        if (gameID == null) throw new DataAccessException("bad request");
 
         // check if game exists
-        GameData game = null;
-        game = gameDAO.getGame(gameID);
+        GameData game = gameDAO.getGame(gameID);
         if (game == null) throw new DataAccessException("bad request");
+
+        // get username from authToken
+        String userName = authDAO.getUsername(authToken);
 
         // update the game with the new player
         GameData updatedGame = updateGame(game, userName, playerColor);
 
         // save updated game to database
-        return gameDAO.saveGame(gameID, updatedGame);
+        gameDAO.saveGame(gameID, updatedGame);
     }
 
     private GameData updateGame(GameData game, String userName, String playerColor) throws DataAccessException {
-        // check if playerColor is valid
+        // checks for bad playerColor (not WHITE or BLACK)
         if (playerColor == null || (!playerColor.equals("WHITE") && !playerColor.equals("BLACK"))) {
             throw new DataAccessException("bad request");
         }
 
-        // add white player
+        // try to add white player
         if (Objects.equals(playerColor, "WHITE") && game.whiteUsername() == null) {
             return new GameData(game.gameID(), userName, game.blackUsername(), game.gameName(), game.game());
         }
-
-        // add black player
+        // try to add black player
         else if (Objects.equals(playerColor, "BLACK") && game.blackUsername() == null) {
             return new GameData(game.gameID(), game.whiteUsername(), userName, game.gameName(), game.game());
         }
-
         // the requested color is already taken
         else throw new DataAccessException("already taken");
     }
@@ -90,6 +89,7 @@ public class GameService {
     }
 
     private boolean isValid(String authToken) throws DataAccessException {
-        return authToken == null || authDAO.getAuth(authToken) == null;
+        if (authToken == null) return false;
+        return Objects.equals(authDAO.getAuth(authToken), authToken);
     }
 }

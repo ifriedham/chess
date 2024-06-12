@@ -169,6 +169,7 @@ public class Server {
     public Object errorHandler(Exception e, Response res) {
         String errorMessage = e.getMessage();
         int statusCode = switch (errorMessage) {
+            case "logout failed" -> 200;
             case "bad request" -> 400;
             case "unauthorized" -> 401;
             case "already taken" -> 403;

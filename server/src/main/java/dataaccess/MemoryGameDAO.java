@@ -30,11 +30,10 @@ public class MemoryGameDAO implements GameDAO {
         return games.values();
     }
 
-    public GameData saveGame(int gameID, GameData game) throws DataAccessException {
+    public void saveGame(int gameID, GameData game) throws DataAccessException {
         if (games.containsKey(gameID)) {
             games.put(gameID, game);
-            return game;
-        } else return null;
+        }
     }
 
     public void removeAllGames() {

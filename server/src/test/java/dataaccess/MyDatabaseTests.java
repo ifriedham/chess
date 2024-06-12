@@ -61,7 +61,7 @@ public class MyDatabaseTests {
                 userDAO.createUser(newUser);
 
                 // attempt to create the same user again
-                assertThrows(SQLException.class, () -> userDAO.createUser(newUser));
+                assertThrows(DataAccessException.class, () -> userDAO.createUser(newUser));
             }
         }
 
@@ -84,7 +84,7 @@ public class MyDatabaseTests {
             @Test
             public void testGetUserFailure() {
                 // attempt to retrieve a non-existent user
-                assertThrows(SQLException.class, () -> userDAO.getUser("nonexistentUser"));
+                assertThrows(DataAccessException.class, () -> userDAO.getUser("nonexistentUser"));
             }
         }
     }
@@ -117,7 +117,7 @@ public class MyDatabaseTests {
                 gameDAO.createGame("testGame", 1);
 
                 // attempt to create the same game again
-                assertThrows(SQLException.class, () -> gameDAO.createGame("testGame", 1));
+                assertThrows(DataAccessException.class, () -> gameDAO.createGame("testGame", 1));
             }
         }
 
@@ -202,8 +202,8 @@ public class MyDatabaseTests {
             @Test
             public void testSaveGameFailure() {
                 // attempt to save non-existent game
-                GameData badGame = new GameData(4, null, null, "badGame", new ChessGame());
-                assertThrows(SQLException.class, () -> gameDAO.saveGame(badGame.gameID(), badGame));
+                GameData badGame = new GameData(9999, null, null, "badGame", new ChessGame());
+                assertThrows(DataAccessException.class, () -> gameDAO.saveGame(badGame.gameID(), badGame));
             }
         }
     }
