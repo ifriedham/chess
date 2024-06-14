@@ -21,7 +21,7 @@ public class ServerFacade {
     String baseUrl;
     String authToken;
 
-    ServerFacade(int givenPort) {
+    public ServerFacade(int givenPort) {
         port = givenPort;
         baseUrl = "http://localhost:" + port;
         authToken = null;
