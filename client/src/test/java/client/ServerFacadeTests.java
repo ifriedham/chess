@@ -1,7 +1,10 @@
 package client;
 
+import model.AuthData;
 import org.junit.jupiter.api.*;
 import server.Server;
+
+import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -21,7 +24,7 @@ public class ServerFacadeTests {
     }
 
     @BeforeEach
-    void clear() {
+    void clear() throws IOException {
         facade.clear();
     }
 
@@ -36,11 +39,21 @@ public class ServerFacadeTests {
         assertTrue(true);
     }
 
-    @Test
-    void register() throws Exception {
-        var authData = facade.register("testPlayer", "testPassword", "test@email.com");
+    @Nested
+    class RegisterTests {
+        @Test
+        void goodRegister() throws Exception {
+            AuthData authData = facade.register("testPlayer", "testPassword", "test@email.com");
+            Assertions.assertTrue(authData.authToken().length() > 10);
+        }
 
-        assertNotNull(authData);
+        @Test
+        void badRegister() throws Exception {
+            Assertions.assertThrows(IOException.class, () -> facade.register(null, "testPassword", "test@email.com"));
+        }
+
+
     }
+
 
 }
