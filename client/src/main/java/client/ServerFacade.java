@@ -5,8 +5,7 @@ import com.google.gson.JsonObject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
+import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Map;
 import com.google.gson.Gson;
@@ -14,6 +13,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import com.google.gson.reflect.TypeToken;
 import model.*;
 
 public class ServerFacade {
@@ -56,9 +56,24 @@ public class ServerFacade {
         }
     }
 
-    public Object doGet () throws IOException {
-        // TODO: implement
-        return null;
+    public Map<String, String> doGet (URL url) throws IOException {
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+        connection.setReadTimeout(5000);
+        connection.setRequestMethod("GET");
+        connection.setDoOutput(true);
+
+        connection.addRequestProperty("Authorization", authToken);
+
+        if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+            try (InputStream resBody = connection.getInputStream()) {
+                InputStreamReader reader = new InputStreamReader(resBody);
+                return new Gson().fromJson(reader, Map.class);
+            }
+        } else {
+            InputStream responseBody = connection.getErrorStream();
+            throw new IOException("Failed to get: HTTP error code : " + responseBody);
+        }
     }
 
     public int doPut (URL url, JsonObject reqJson) throws IOException {
@@ -148,11 +163,26 @@ public class ServerFacade {
         return doDelete(url, reqJson);
     }
 
-    public Collection<GameData> listGames() throws IOException {
-        return null;
+    public Collection<GameData> listGames(String authToken) throws IOException {
+        this.authToken = authToken;
+        URL url = new URL(baseUrl + "/game");
+
+        // Create JSON object with auth token
+        JsonObject reqJson = new JsonObject();
+        reqJson.addProperty("authToken", authToken);
+
+        // get list
+        Map<String, String> res = doGet(url);
+
+        // convert list to collection
+        Type collectionType = new TypeToken<Collection<GameData>>() {}.getType();
+        Collection<GameData> gameList = new Gson().fromJson(new Gson().toJson(res.get("games")), collectionType);
+
+        return gameList;
     }
 
-    public Integer createGame(String authToken, String gameName) throws IOException {
+
+        public Integer createGame(String authToken, String gameName) throws IOException {
         this.authToken = authToken;
         URL url = new URL(baseUrl + "/game");
 
