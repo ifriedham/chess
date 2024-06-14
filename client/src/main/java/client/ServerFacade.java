@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
+import java.util.Collection;
 import java.util.Map;
 import com.google.gson.Gson;
 import java.io.OutputStream;
@@ -77,8 +78,10 @@ public class ServerFacade {
         }
 
         // check response
-        if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-            throw new IOException("Failed to delete: HTTP error code : " + connection.getResponseCode());
+        int responseCode = connection.getResponseCode();
+        System.out.println("Response Code: " + responseCode);
+        if (responseCode != HttpURLConnection.HTTP_OK) {
+            throw new IOException("Failed to delete: HTTP error code : " + responseCode);
         }
     }
 
@@ -95,6 +98,37 @@ public class ServerFacade {
 
 
         return new AuthData(res.get("authToken"), res.get("username"));
+    }
+
+    public AuthData login(String username, String password) throws IOException {
+        URL url = new URL(baseUrl + "/session");
+
+        // Create JSON object with login details
+        JsonObject reqJson = new JsonObject();
+        reqJson.addProperty("username", username);
+        reqJson.addProperty("password", password);
+        Map<String, String> res = doPost(url, reqJson);
+
+        return new AuthData(res.get("authToken"), res.get("username"));
+    }
+
+    public void logout(String authToken) throws IOException {
+        URL url = new URL(baseUrl + "/session");
+        JsonObject reqJson = new JsonObject();
+        reqJson.addProperty("authToken", authToken);
+        doDelete(url, reqJson);
+    }
+
+    public Collection<GameData> listGames() {
+        return null;
+    }
+
+    public int createGame(String authToken, String gameName) {
+        return 0;
+    }
+
+    public void joinGame(String authToken, String playerColor, int gameId) {
+
     }
 
     public void clear() throws IOException {
