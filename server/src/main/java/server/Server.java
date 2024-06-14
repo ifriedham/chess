@@ -119,7 +119,7 @@ public class Server {
             GameData request = serializer.fromJson(req.body(), GameData.class);
             String gameName = request.gameName();
 
-            Integer result = gameService.createGame(authToken, gameName);
+            String result = String.valueOf(gameService.createGame(authToken, gameName));
 
             res.status(200);
             var body = serializer.toJson(Map.of("gameID", result));

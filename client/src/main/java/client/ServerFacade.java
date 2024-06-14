@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.util.Collection;
 import java.util.Map;
 import com.google.gson.Gson;
@@ -18,10 +19,12 @@ import model.*;
 public class ServerFacade {
     int port;
     String baseUrl;
+    String authToken;
 
     ServerFacade(int givenPort) {
         port = givenPort;
         baseUrl = "http://localhost:" + port;
+        authToken = null;
     }
 
     public Map<String, String> doPost(URL url, JsonObject reqJson) throws IOException {
@@ -32,7 +35,7 @@ public class ServerFacade {
         connection.setDoOutput(true);
 
         //write out header
-        connection.addRequestProperty("Content-Type", "application/json");
+        connection.addRequestProperty("authorization", authToken);
 
         // write json to output stream
         try (OutputStream outputStream = connection.getOutputStream()) {
@@ -53,15 +56,38 @@ public class ServerFacade {
         }
     }
 
-   /* public Object doGet () {
-
+    public Object doGet () throws IOException {
+        // TODO: implement
+        return null;
     }
 
-    public Object doPut () {
+    public int doPut (URL url, JsonObject reqJson) throws IOException {
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
-    }*/
+        connection.setReadTimeout(5000);
+        connection.setRequestMethod("PUT");
+        connection.setDoOutput(true);
 
-    public void doDelete(URL url, JsonObject reqJson) throws IOException {
+        //write out header
+        connection.addRequestProperty("Authorization", authToken);
+
+        // write json to output stream
+        try (OutputStream outputStream = connection.getOutputStream()) {
+            var jsonBody = new Gson().toJson(reqJson);
+            outputStream.write(jsonBody.getBytes());
+        }
+
+        // check response
+        int responseCode = connection.getResponseCode();
+        System.out.println("Response Code: " + responseCode);
+        if (responseCode != HttpURLConnection.HTTP_OK) {
+            throw new IOException("Failed to join game: HTTP error code : " + responseCode);
+        }
+
+        return responseCode;
+    }
+
+    public int doDelete(URL url, JsonObject reqJson) throws IOException {
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
         connection.setReadTimeout(5000);
@@ -69,7 +95,7 @@ public class ServerFacade {
         connection.setDoOutput(true);
 
         //write out header
-        connection.addRequestProperty("Content-Type", "application/json");
+        connection.addRequestProperty("Authorization", authToken);
 
         // write json to output stream
         try (OutputStream outputStream = connection.getOutputStream()) {
@@ -83,6 +109,8 @@ public class ServerFacade {
         if (responseCode != HttpURLConnection.HTTP_OK) {
             throw new IOException("Failed to delete: HTTP error code : " + responseCode);
         }
+
+        return responseCode;
     }
 
 
@@ -112,23 +140,42 @@ public class ServerFacade {
         return new AuthData(res.get("authToken"), res.get("username"));
     }
 
-    public void logout(String authToken) throws IOException {
+    public int logout(String authToken) throws IOException {
+        this.authToken = authToken;
         URL url = new URL(baseUrl + "/session");
         JsonObject reqJson = new JsonObject();
         reqJson.addProperty("authToken", authToken);
-        doDelete(url, reqJson);
+        return doDelete(url, reqJson);
     }
 
-    public Collection<GameData> listGames() {
+    public Collection<GameData> listGames() throws IOException {
         return null;
     }
 
-    public int createGame(String authToken, String gameName) {
-        return 0;
+    public Integer createGame(String authToken, String gameName) throws IOException {
+        this.authToken = authToken;
+        URL url = new URL(baseUrl + "/game");
+
+        // Create JSON object with game name and auth token
+        JsonObject reqJson = new JsonObject();
+        reqJson.addProperty("authToken", authToken);
+        reqJson.addProperty("gameName", gameName);
+        Map<String, String> res = doPost(url, reqJson);
+
+        return Integer.valueOf(res.get("gameID"));
     }
 
-    public void joinGame(String authToken, String playerColor, int gameId) {
+    public int joinGame(String authToken, String playerColor, int gameId) throws IOException {
+        this.authToken = authToken;
+        URL url = new URL(baseUrl + "/game");
 
+        // Create JSON object with auth token, player color, and game ID
+        JsonObject reqJson = new JsonObject();
+        reqJson.addProperty("authToken", authToken);
+        reqJson.addProperty("playerColor", playerColor);
+        reqJson.addProperty("gameID", gameId);
+
+        return doPut(url, reqJson);
     }
 
     public void clear() throws IOException {
