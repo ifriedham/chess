@@ -120,7 +120,8 @@ public class ConsoleUI {
 
         try {
             out.println("OBSERVE NOT YET IMPLEMENTED");
-            out.println("CHESSBOARD HERE");
+            //out.println("CHESSBOARD HERE");
+            BoardUI.printBoard(out);
         } catch (Exception e) {
             out.println(e.getMessage());
         }
@@ -146,7 +147,7 @@ public class ConsoleUI {
         try {
             facade.joinGame(auth.authToken(), team, gameID);
             out.println("Joined game ["+ gameID + "] as the " + team + " player");
-            out.println("CHESSBOARD HERE");
+            BoardUI.printBoard(out);
         } catch (Exception e) {
             out.println(e.getMessage());
         }
