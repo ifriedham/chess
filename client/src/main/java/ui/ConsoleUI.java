@@ -169,6 +169,7 @@ public class ConsoleUI {
             if (numberedList != null) numberedList.clear();
             out.println("Games:");
             for (var game : gamesList) {
+                // TODO: dont print ID, fix so dont need either
                 out.println(i + " -- Name: " + game.gameName() + ", ID: " + game.gameID() + ", White player: " + game.whiteUsername() + ", Black player: " + game.blackUsername());
                 numberedList.put(i, game);
                 i++;
