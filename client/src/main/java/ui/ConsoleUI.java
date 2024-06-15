@@ -2,6 +2,7 @@ package ui;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Scanner;
@@ -18,12 +19,13 @@ public class ConsoleUI {
     ChessBoard board;
     boolean loggedIn;
     private AuthData auth;
-    private Map<Integer, GameData> numberedList = null;
+    private Map<Integer, GameData> numberedList;
 
     public ConsoleUI(ServerFacade facade) {
         this.facade = facade;
         board = new ChessBoard();
         loggedIn = false;
+        numberedList = new HashMap<>();
     }
 
 
@@ -85,6 +87,9 @@ public class ConsoleUI {
             case "logout":
                 logout(out, scanner);
                 break;
+            case "help":
+                help(out);
+                break;
             case "quit":
                 break;
             default:
@@ -123,13 +128,18 @@ public class ConsoleUI {
 
     private void play(PrintStream out, Scanner scanner) {
         out.print("Enter either the number or ID of the game you'd like to join: ");
-        int gameID = scanner.nextInt();
+        String input = scanner.nextLine();
+
+        int num = Integer.parseInt(input);
+        int gameID = num;
+
         out.print("Please enter your desired team (WHITE or BLACK): ");
-        String team = scanner.nextLine();
+        String givenTeam = scanner.nextLine();
+        String team = givenTeam.toUpperCase(); // in case they give a lowercase team
 
         // check if the given number is from the listgames function
-        if (numberedList != null && numberedList.containsKey(gameID)) {
-            GameData game = numberedList.get(gameID);
+        if (numberedList != null && numberedList.containsKey(num)) {
+            GameData game = numberedList.get(num);
             gameID = game.gameID();
         }
 
@@ -146,6 +156,7 @@ public class ConsoleUI {
         try {
             var gamesList = facade.listGames(auth.authToken());
             int i = 1;
+            if (numberedList != null) numberedList.clear();
             out.println("Games:");
             for (var game : gamesList) {
                 out.println(i + " -- Name: " + game.gameName() + ", ID: " + game.gameID() + ", White player: " + game.whiteUsername() + ", Black player: " + game.blackUsername());

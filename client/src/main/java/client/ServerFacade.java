@@ -94,7 +94,7 @@ public class ServerFacade {
 
         // check response
         int responseCode = connection.getResponseCode();
-        System.out.println("Response Code: " + responseCode);
+        //System.out.println("Response Code: " + responseCode);
         if (responseCode != HttpURLConnection.HTTP_OK) {
             throw new IOException("Failed to join game: HTTP error code : " + responseCode);
         }
@@ -120,7 +120,7 @@ public class ServerFacade {
 
         // check response
         int responseCode = connection.getResponseCode();
-        System.out.println("Response Code: " + responseCode);
+        //System.out.println("Response Code: " + responseCode);
         if (responseCode != HttpURLConnection.HTTP_OK) {
             throw new IOException("Failed to delete: HTTP error code : " + responseCode);
         }
