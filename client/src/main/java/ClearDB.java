@@ -1,5 +1,3 @@
-import chess.*;
-import ui.*;
 import client.ServerFacade;
 import server.Server;
 
@@ -12,7 +10,7 @@ public class ClearDB {
         System.out.println("Started test HTTP server on " + port);
         ServerFacade facade = new ServerFacade(port);
         facade.clear();
-        System.out.println("server cleared" + port);
+        System.out.println("server cleared");
         server.stop();
     }
 }

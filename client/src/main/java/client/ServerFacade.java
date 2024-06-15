@@ -52,6 +52,7 @@ public class ServerFacade {
         }
         else {
             InputStream responseBody = connection.getErrorStream();
+            // TODO: correctly handle error response
             throw new IOException("Failed to post: HTTP error code : " + responseBody);
         }
     }
@@ -72,6 +73,7 @@ public class ServerFacade {
             }
         } else {
             InputStream responseBody = connection.getErrorStream();
+            // TODO: correctly handle error response
             throw new IOException("Failed to get: HTTP error code : " + responseBody);
         }
     }
@@ -96,6 +98,7 @@ public class ServerFacade {
         int responseCode = connection.getResponseCode();
         //System.out.println("Response Code: " + responseCode);
         if (responseCode != HttpURLConnection.HTTP_OK) {
+            // TODO: correctly handle error response
             throw new IOException("Failed to join game: HTTP error code : " + responseCode);
         }
 
@@ -122,6 +125,7 @@ public class ServerFacade {
         int responseCode = connection.getResponseCode();
         //System.out.println("Response Code: " + responseCode);
         if (responseCode != HttpURLConnection.HTTP_OK) {
+            // TODO: correctly handle error response
             throw new IOException("Failed to delete: HTTP error code : " + responseCode);
         }
 
