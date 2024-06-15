@@ -91,6 +91,7 @@ public class ConsoleUI {
                 help(out);
                 break;
             case "quit":
+            case "exit":
                 break;
             default:
                 out.println("Invalid command. Type 'help' for a list of commands.");
@@ -132,6 +133,14 @@ public class ConsoleUI {
         String input = scanner.nextLine();
 
         int num = Integer.parseInt(input);
+        try {
+            num = Integer.parseInt(input);
+        } catch (NumberFormatException e) {
+            out.println("Invalid game ID or Number.");
+            return;
+        }
+
+
         int gameID = num;
 
         out.print("Please enter your desired team (WHITE or BLACK): ");

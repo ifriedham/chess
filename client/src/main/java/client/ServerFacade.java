@@ -185,8 +185,7 @@ public class ServerFacade {
         return gameList;
     }
 
-
-        public Integer createGame(String authToken, String gameName) throws IOException {
+    public Integer createGame(String authToken, String gameName) throws IOException {
         this.authToken = authToken;
         URL url = new URL(baseUrl + "/game");
 

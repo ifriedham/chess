@@ -6,18 +6,22 @@ import chess.*;
 import static ui.EscapeSequences.*;
 
 public class BoardUI {
-    private static ChessBoard board;
+    private static ChessBoard board = new ChessBoard();
 
     private static final int DRAWING_SIZE_IN_SQUARES = 10;
     private static final int BOARD_SIZE_IN_SQUARES = 8;
 
 
     public BoardUI() {
-        board = new ChessBoard();
     }
 
 
     public static void printBoard(PrintStream out) {
+        // TEMP
+        board.resetBoard();
+        // END TEMP
+
+
         drawWhiteBoard(out);
         out.println();
         drawBlackBoard(out);
@@ -40,6 +44,8 @@ public class BoardUI {
         String[] header = new String[0];
         out.print(SET_BG_COLOR_LIGHT_GREY);
         out.print(SET_TEXT_COLOR_BLACK);
+
+        // create header text
         switch (team) {
             case "WHITE":
                 header = new String[] {"A", "B", "C", "D", "E", "F", "G", "H"};
@@ -48,33 +54,33 @@ public class BoardUI {
                 header = new String[] {"H", "G", "F", "E", "D", "C", "B", "A"};
                 break;
         }
-        for (int col = 0; col < DRAWING_SIZE_IN_SQUARES; ++col) {
-            if (col == 0 || col == DRAWING_SIZE_IN_SQUARES -1) {
+
+        for (int col = 0; col < DRAWING_SIZE_IN_SQUARES; col++) {
+            // corner squares
+            if (col == 0 || col == DRAWING_SIZE_IN_SQUARES - 1) {
                 out.print(EMPTY);
             }
-            else {
-                out.print(header[col]);
+            // everything else
+            else if (col > 0 && col < DRAWING_SIZE_IN_SQUARES - 2){
+                int boardCol = col - 1;
+                out.print(header[boardCol]);
             }
         }
     }
 
     private static void drawRows(PrintStream out, String team) {
-        int boardCol = 0;
-        int boardRow = 0;
-        for (int row = 1; row < BOARD_SIZE_IN_SQUARES - 2; row++) {
-            for (int col = 0; col < DRAWING_SIZE_IN_SQUARES; col++) {
-                boardCol = col - 1;
-                boardRow = row - 1;
 
-                // print side headers
+        for (int row = 1; row < BOARD_SIZE_IN_SQUARES; row++) {
+            for (int col = 0; col < DRAWING_SIZE_IN_SQUARES; col++) {
+                // print side header squares
                 if (col == 0 || col == DRAWING_SIZE_IN_SQUARES - 1) {
                     out.print(SET_BG_COLOR_LIGHT_GREY);
                     out.print(SET_TEXT_COLOR_BLACK);
-                    out.print(boardRow);
+                    out.print(row);
                 }
                 // print board row
                 else {
-                    String piece = getPiece(boardRow, boardCol);
+                    String piece = getPiece(row, col);
 
                     // set square color
                     if (row % 2 == 0) {
