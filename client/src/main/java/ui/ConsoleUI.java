@@ -33,7 +33,7 @@ public class ConsoleUI {
         Scanner scanner = new Scanner(System.in);
 
         out.print(ERASE_SCREEN);
-        out.print("♕ Welcome to 240 chess. Type Help to get started. ♕\n");
+        out.println("♕ Welcome to 240 chess. Type 'help' to get started. ♕");
 
         while (!Objects.equals(input, "quit")) {
             if (!(loggedIn)) {
@@ -46,7 +46,9 @@ public class ConsoleUI {
                 postLogin(out, scanner, input);
             }
         }
+        out.println("Hope you had fun, bye!");
     }
+
 
     public void preLogin(PrintStream out, Scanner scanner, String input) {
         switch (input) {
@@ -90,13 +92,14 @@ public class ConsoleUI {
         }
     }
 
+
     private void logout(PrintStream out, Scanner scanner) {
         try {
             facade.logout(auth.authToken());
             out.println("Successfully logged out.");
             loggedIn = false;
         } catch (Exception e) {
-            out.println("Failed to logout: " + e.getMessage());
+            out.println(e.getMessage());
         }
     }
 
@@ -114,7 +117,7 @@ public class ConsoleUI {
             out.println("OBSERVE NOT YET IMPLEMENTED");
             out.println("CHESSBOARD HERE");
         } catch (Exception e) {
-            out.println("Failed to observe game: " + e.getMessage());
+            out.println(e.getMessage());
         }
     }
 
@@ -135,7 +138,7 @@ public class ConsoleUI {
             out.println("Joined game ["+ gameID + "] as the " + team + " player");
             out.println("CHESSBOARD HERE");
         } catch (Exception e) {
-            out.println("Failed to join game: " + e.getMessage());
+            out.println(e.getMessage());
         }
     }
 
@@ -150,7 +153,7 @@ public class ConsoleUI {
                 i++;
             }
         } catch (Exception e) {
-            out.println("Failed to list games: " + e.getMessage());
+            out.println(e.getMessage());
         }
     }
 
@@ -161,12 +164,9 @@ public class ConsoleUI {
             int id = facade.createGame(auth.authToken(), gameName);
             out.println("Game created with ID: " + id);
         } catch (Exception e) {
-            out.println("Failed to create game: " + e.getMessage());
+            out.println(e.getMessage());
         }
     }
-
-
-
 
     public void register (PrintStream out, Scanner scanner){
         out.print("Enter new username: ");
@@ -181,7 +181,7 @@ public class ConsoleUI {
             out.println("Registration successful.  Hello, " + username + "!");
             loggedIn = true;
         } catch (Exception e) {
-            out.println("Registration failed: " + e.getMessage());
+            out.println(e.getMessage());
         }
     }
 
@@ -196,11 +196,9 @@ public class ConsoleUI {
             out.println("Login successful.  Hello, " + username + "!");
             loggedIn = true;
         } catch (Exception e) {
-            out.println("Login failed: " + e.getMessage());
+            out.println(e.getMessage());
         }
     }
-
-
 
     public void help(PrintStream out) {
         if (loggedIn) {
