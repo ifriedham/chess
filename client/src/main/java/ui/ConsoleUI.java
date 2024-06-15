@@ -2,12 +2,14 @@ package ui;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Scanner;
 
 import chess.*;
 import client.ServerFacade;
 import model.AuthData;
+import model.GameData;
 
 import static ui.EscapeSequences.*;
 
@@ -16,6 +18,7 @@ public class ConsoleUI {
     ChessBoard board;
     boolean loggedIn;
     private AuthData auth;
+    private Map<Integer, GameData> numberedList = null;
 
     public ConsoleUI(ServerFacade facade) {
         this.facade = facade;
@@ -71,31 +74,66 @@ public class ConsoleUI {
             case "list":
                 list(out, scanner);
                 break;
-            case "join":
-                join(out, scanner);
+            case "play":
+                play(out, scanner);
                 break;
             case "observe":
+                observe(out, scanner);
                 break;
             case "logout":
+                logout(out, scanner);
                 break;
             case "quit":
                 break;
             default:
                 out.println("Invalid command. Type 'help' for a list of commands.");
         }
-
-
-
     }
 
-    private void join(PrintStream out, Scanner scanner) {
-        out.print("Enter the ID of the game you'd like to join: ");
+    private void logout(PrintStream out, Scanner scanner) {
+        try {
+            facade.logout(auth.authToken());
+            out.println("Successfully logged out.");
+            loggedIn = false;
+        } catch (Exception e) {
+            out.println("Failed to logout: " + e.getMessage());
+        }
+    }
+
+    private void observe(PrintStream out, Scanner scanner) {
+        out.print("Enter the ID of the game you'd like to observe: ");
+        int gameID = scanner.nextInt();
+
+        // check if the given number is from the listgames function
+        if (numberedList != null && numberedList.containsKey(gameID)) {
+            GameData game = numberedList.get(gameID);
+            gameID = game.gameID();
+        }
+
+        try {
+            out.println("OBSERVE NOT YET IMPLEMENTED");
+            out.println("CHESSBOARD HERE");
+        } catch (Exception e) {
+            out.println("Failed to observe game: " + e.getMessage());
+        }
+    }
+
+    private void play(PrintStream out, Scanner scanner) {
+        out.print("Enter either the number or ID of the game you'd like to join: ");
         int gameID = scanner.nextInt();
         out.print("Please enter your desired team (WHITE or BLACK): ");
         String team = scanner.nextLine();
+
+        // check if the given number is from the listgames function
+        if (numberedList != null && numberedList.containsKey(gameID)) {
+            GameData game = numberedList.get(gameID);
+            gameID = game.gameID();
+        }
+
         try {
             facade.joinGame(auth.authToken(), team, gameID);
             out.println("Joined game ["+ gameID + "] as the " + team + " player");
+            out.println("CHESSBOARD HERE");
         } catch (Exception e) {
             out.println("Failed to join game: " + e.getMessage());
         }
@@ -104,9 +142,12 @@ public class ConsoleUI {
     private void list(PrintStream out, Scanner scanner) {
         try {
             var gamesList = facade.listGames(auth.authToken());
+            int i = 1;
             out.println("Games:");
             for (var game : gamesList) {
-                out.println(game);
+                out.println(i + " -- Name: " + game.gameName() + ", ID: " + game.gameID() + ", White player: " + game.whiteUsername() + ", Black player: " + game.blackUsername());
+                numberedList.put(i, game);
+                i++;
             }
         } catch (Exception e) {
             out.println("Failed to list games: " + e.getMessage());
@@ -165,7 +206,7 @@ public class ConsoleUI {
         if (loggedIn) {
             out.println(SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE + "create" + RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR + " - make a new game");
             out.println(SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE + "list" + RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR + " - get a list of games");
-            out.println(SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE + "join" + RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR + " - join a game as either BLACK or WHITE");
+            out.println(SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE + "play" + RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR + " - join a game as either BLACK or WHITE");
             out.println(SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE + "observe" + RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR + " - view a game as a spectator");
             out.println(SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE + "logout" + RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR + " - logout and return to the main menu");
         }
