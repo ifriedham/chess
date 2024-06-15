@@ -17,7 +17,7 @@ public class Server {
 
     public static void main(String[] args) {
         Server server = new Server();
-        server.run(Integer.parseInt(args[0]));
+        server.run(8080);
     }
 
     public int run(int desiredPort) {

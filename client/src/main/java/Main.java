@@ -8,14 +8,8 @@ public class Main {
         var piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
         System.out.println("♕ 240 Chess Client: " + piece);
 
-        Server server = new Server();
-        var port = server.run(8080);
-        System.out.println("Started HTTP server on " + port);
-
-        ServerFacade facade = new ServerFacade(port);
+        ServerFacade facade = new ServerFacade(8080);
         ConsoleUI ui = new ConsoleUI(facade);
         ui.run();
-
-        server.stop();
     }
 }
