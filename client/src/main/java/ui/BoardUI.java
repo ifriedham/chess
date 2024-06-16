@@ -91,6 +91,8 @@ public class BoardUI {
                     // set square color
                     if (row % 2 == 0) {
                         if (col % 2 == 0) {
+                            // TODO: change colors so the board is easier to read
+                            // TODO: print board in the white perspective too
                             out.print(SET_BG_COLOR_WHITE);
                             out.print(SET_TEXT_COLOR_BLACK);
                         }

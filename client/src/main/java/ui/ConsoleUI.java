@@ -120,8 +120,6 @@ public class ConsoleUI {
         }
 
         try {
-            out.println("OBSERVE NOT YET IMPLEMENTED");
-            //out.println("CHESSBOARD HERE");
             BoardUI.printBoard(out);
         } catch (Exception e) {
             out.println(e.getMessage());
@@ -129,7 +127,7 @@ public class ConsoleUI {
     }
 
     private void play(PrintStream out, Scanner scanner) {
-        out.print("Enter either the number or ID of the game you'd like to join: ");
+        out.print("Enter either the number of the game you'd like to join: ");
         String input = scanner.nextLine();
 
         int num = Integer.parseInt(input);
@@ -169,8 +167,7 @@ public class ConsoleUI {
             if (numberedList != null) numberedList.clear();
             out.println("Games:");
             for (var game : gamesList) {
-                // TODO: dont print ID, fix so dont need either
-                out.println(i + " -- Name: " + game.gameName() + ", ID: " + game.gameID() + ", White player: " + game.whiteUsername() + ", Black player: " + game.blackUsername());
+                out.println(i + " -- Name: " + game.gameName() + ", White player: " + game.whiteUsername() + ", Black player: " + game.blackUsername());
                 numberedList.put(i, game);
                 i++;
             }
