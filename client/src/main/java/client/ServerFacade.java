@@ -1,5 +1,7 @@
 package client;
 
+import chess.ChessMove;
+import chess.ChessPosition;
 import com.google.gson.JsonObject;
 
 import java.io.IOException;
@@ -215,5 +217,18 @@ public class ServerFacade {
         URL url = new URL(baseUrl + "/db");
         JsonObject reqJson = new JsonObject();
         doDelete(url, reqJson);
+    }
+
+
+    public void makeMove(String startPos, String endPos) {
+
+    }
+
+    public void resign(String authToken){
+
+    }
+
+    public collection<ChessMove> getValidMoves(ChessPosition pos){
+        return null;
     }
 }

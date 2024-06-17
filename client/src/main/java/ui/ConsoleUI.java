@@ -2,31 +2,38 @@ package ui;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Scanner;
+import java.util.*;
 
 import chess.*;
 import client.ServerFacade;
 import model.AuthData;
 import model.GameData;
 
+import static chess.ChessGame.TeamColor.WHITE;
 import static ui.EscapeSequences.*;
 
 public class ConsoleUI {
-    ServerFacade facade;
-    ChessBoard board;
-    boolean loggedIn;
+    private final ServerFacade facade;
+    private ChessBoard board;
+    private ChessGame game;
     private AuthData auth;
     private Map<Integer, GameData> numberedList;
+
+    boolean loggedIn;
+    boolean inGame;
+    boolean isObserver;
+
     PrintStream out;
     Scanner scanner;
+    private ChessGame.TeamColor playerColor;
 
     public ConsoleUI(ServerFacade facade) {
         this.facade = facade;
         board = new ChessBoard();
+        game = new ChessGame();
         loggedIn = false;
+        inGame = false;
+        isObserver = true;
         numberedList = new HashMap<>();
     }
 
@@ -42,7 +49,8 @@ public class ConsoleUI {
             if (!(loggedIn)) {
                 out.print("[LOGGED_OUT] >>> ");
                 input = scanner.nextLine();
-                preLogin(input);
+                if (inGame) inGame(input);
+                else preLogin(input);
             } else {
                 out.print("[LOGGED_IN] >>> ");
                 input = scanner.nextLine();
@@ -53,7 +61,7 @@ public class ConsoleUI {
     }
 
 
-    public void preLogin(String input) {
+    private void preLogin(String input) {
         switch (input) {
             case "register":
                 register();
@@ -64,7 +72,7 @@ public class ConsoleUI {
             case "help":
                 help();
                 break;
-            case "quit":
+            case "exit", "quit":
                 break;
             default:
                 out.println("Invalid command. Type 'help' for a list of commands.");
@@ -91,16 +99,93 @@ public class ConsoleUI {
             case "help":
                 help();
                 break;
-            case "quit":
-                break;
-            case "exit":
+            case "exit", "quit":
                 break;
             default:
                 out.println("Invalid command. Type 'help' for a list of commands.");
         }
     }
 
+    private void inGame(String input){
 
+        switch (input) {
+            case "redraw":
+                redraw();
+                break;
+            case "make move":
+                makeMove();
+                break;
+            case "resign":
+                resign();
+                break;
+            case "highlight":
+                highlight();
+                break;
+            case "help":
+                help();
+                break;
+            case "exit", "quit", "leave":
+                inGame = false;
+                break;
+            default:
+                out.println("Invalid command. Type 'help' for a list of commands.");
+        }
+    }
+
+    // INGAME LOGIC
+    private void redraw() {
+        new BoardUI(out, game).printBoard();
+    }
+
+    private void makeMove() {
+        out.println("Which piece would you like to move? (ex: E4): ");
+        String start = scanner.nextLine();
+        out.println("Where would you like to move it? (ex: E5): ");
+        String end = scanner.nextLine();
+
+        try {
+            facade.makeMove(start, end);
+            new BoardUI(out, game).printBoard();
+        } catch (Exception e) {
+            out.println("Invalid move.");
+        }
+    }
+
+    private void resign() {
+        out.println("Are you sure you want to resign? (y/n): ");
+        String input = scanner.nextLine();
+        if (input.equals("y")) {
+            try {
+                facade.resign(auth.authToken());
+                out.println("You have resigned the game.");
+                inGame = false;
+            } catch (Exception e) {
+                out.println("Failed to resign.");
+            }
+        }
+    }
+
+    private void highlight() {
+        out.println("Which piece's moves would you like to highlight? (ex: E4): ");
+        String input = scanner.nextLine();
+        // convert input to ChessPosition
+        char colChar = input.charAt(0);
+        int col = colChar - 'A' + 1;
+        int row = Integer.parseInt(input.substring(1));
+        ChessPosition pos = new ChessPosition(row, col);
+
+        try {
+            Collection<ChessMove> moves = facade.getValidMoves(pos);
+            Collection<ChessPosition> endPositions = moves.stream().map(ChessMove::getEndPosition).toList();
+            new BoardUI(out, game).printValidMoves(endPositions, pos, playerColor);
+        } catch (Exception e) {
+            out.println("Invalid move.");
+        }
+    }
+
+
+
+    // STANDARD LOGIC
     private void logout() {
         try {
             facade.logout(auth.authToken());
@@ -118,10 +203,10 @@ public class ConsoleUI {
         if (isInList(input)) {
             int gameNum = Integer.parseInt(input);
             GameData listedGame = numberedList.get(gameNum);
-            ChessGame game = listedGame.game();
+            game = listedGame.game();
 
-            // print out boards
-            new BoardUI(out, game).printBoard();
+            // print out board
+            new BoardUI(out, game).printBoard(WHITE);
         }
     }
 
@@ -134,7 +219,6 @@ public class ConsoleUI {
             int gameNum = Integer.parseInt(input);
             GameData listedGame = numberedList.get(gameNum);
             int gameID = listedGame.gameID();
-            ChessGame game = listedGame.game();
 
             // get desired team
             out.print("Please enter your desired team (WHITE or BLACK): ");
@@ -149,13 +233,21 @@ public class ConsoleUI {
             // join game
             try {
                 facade.joinGame(auth.authToken(), team, gameID);
-                out.println("Joined game ["+ gameID + "] as the " + team + " player");
+                out.println("Joined ["+ listedGame.gameName() + "] as the " + team + " player");
 
-                // proceed to Gameplay menu
-                new GameplayUI(scanner, out, game);
+                // proceed to inGame ui
+                game = listedGame.game();
+                inGame = true;
 
+                if (team.equals("WHITE")){
+                    playerColor = ChessGame.TeamColor.WHITE;
+                    new BoardUI(out, game).printBoard(WHITE);
+                }
+                else{
+                    playerColor = ChessGame.TeamColor.BLACK;
+                    new BoardUI(out, game).printBoard(ChessGame.TeamColor.BLACK);
+                }
 
-                new BoardUI(out, game).printBoard();
             } catch (Exception e) {
                 out.println("Failed to join game");
             }
@@ -183,7 +275,7 @@ public class ConsoleUI {
         String gameName = scanner.nextLine();
         try {
             int id = facade.createGame(auth.authToken(), gameName);
-            out.println("Game created with ID: " + id);
+            out.println("Game created");
         } catch (Exception e) {
             out.println(e.getMessage());
         }
@@ -223,11 +315,19 @@ public class ConsoleUI {
 
     public void help() {
         if (loggedIn) {
-            out.println(SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE + "create" + RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR + " - make a new game");
-            out.println(SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE + "list" + RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR + " - get a list of games");
-            out.println(SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE + "play" + RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR + " - join a game as either BLACK or WHITE");
-            out.println(SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE + "observe" + RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR + " - view a game as a spectator");
-            out.println(SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE + "logout" + RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR + " - logout and return to the main menu");
+            if (inGame) {
+                out.println(SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE + "make move" + RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR + " - make a move in the game");
+                out.println(SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE + "highlight" + RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR + " - highlight possible legal moves");
+                out.println(SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE + "redraw" + RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR + " - redraw the board");
+                out.println(SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE + "leave" + RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR + " - leave the game");
+                out.println(SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE + "resign" + RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR + " - resign the game");
+            } else {
+                out.println(SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE + "create" + RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR + " - make a new game");
+                out.println(SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE + "list" + RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR + " - get a list of games");
+                out.println(SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE + "play" + RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR + " - join a game as either BLACK or WHITE");
+                out.println(SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE + "observe" + RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR + " - view a game as a spectator");
+                out.println(SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE + "logout" + RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR + " - logout and return to the main menu");
+            }
         }
         else {
             out.println(SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE + "register" + RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR + " - to create an account");
