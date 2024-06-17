@@ -8,28 +8,29 @@ import static ui.EscapeSequences.*;
 public class BoardUI {
     private static final int DRAWING_SIZE_IN_SQUARES = 10;
     private static final int BOARD_SIZE_IN_SQUARES = 8;
-    private static ChessBoard board = new ChessBoard();
+    private static ChessBoard board;
+    private static PrintStream out = null;
 
-
-    public BoardUI(ChessBoard board) {
-        this.board = board;
+    public BoardUI(PrintStream outStream, ChessGame givenGame) {
+        board = givenGame.getBoard();
+        out = outStream;
     }
 
 
-    public void printBoards(PrintStream out) {
-        drawBoard(out, "BLACK");
+    public void printBoards() {
+        drawBoard("BLACK");
         out.println();
-        drawBoard(out, "WHITE");
+        drawBoard("WHITE");
     }
 
-    private static void drawBoard(PrintStream out, String team) {
-        drawHeader(out, team);
-        drawRows(out, team);
-        drawHeader(out, team);
+    private static void drawBoard(String team) {
+        drawHeader(team);
+        drawRows(team);
+        drawHeader(team);
     }
 
 
-    private static void drawHeader(PrintStream out, String team) {
+    private static void drawHeader(String team) {
         String headerLine = "";
         out.print(SET_BG_COLOR_LIGHT_GREY);
         out.print(SET_TEXT_COLOR_BLACK);
@@ -37,7 +38,6 @@ public class BoardUI {
         headerLine = switch (team) {
             case "WHITE" -> "    A   B  C   D   E  F   G   H    ";
 
-            //headers = new String[] {"A", "B", "C", "D", "E", "F", "G", "H"};
             case "BLACK" -> "    H   G  F   E   D  C   B   A    ";
             default -> headerLine;
         };
@@ -47,12 +47,12 @@ public class BoardUI {
         out.println(RESET_BG_COLOR);
     }
 
-    private static void drawRows(PrintStream out, String team) {
+    private static void drawRows(String team) {
         switch (team) {
             case "WHITE":
                 for (int row = BOARD_SIZE_IN_SQUARES; row >= 1; row--) {
                     for (int col = 0; col < DRAWING_SIZE_IN_SQUARES; col++) {
-                        printRow(out, row, col);
+                        printRow(row, col);
                     }
                     out.println(RESET_BG_COLOR);
                 }
@@ -63,7 +63,7 @@ public class BoardUI {
 
 
                     for (int col = DRAWING_SIZE_IN_SQUARES - 1; col >= 0; col--) {
-                        printRow(out, row, col);
+                        printRow(row, col);
                     }
                     out.println(RESET_BG_COLOR);
                 }
@@ -71,7 +71,7 @@ public class BoardUI {
         }
     }
 
-    private static void printRow(PrintStream out, int row, int col) {
+    private static void printRow(int row, int col) {
         // print side header squares
         if (col == 0 || col == DRAWING_SIZE_IN_SQUARES - 1) {
             out.print(SET_BG_COLOR_LIGHT_GREY);
@@ -99,13 +99,13 @@ public class BoardUI {
                 }
             }
 
-            String piece = getPiece(out, row, col);
+            String piece = getPiece(row, col);
             out.print(piece);
             out.print(RESET_TEXT_COLOR);
         }
     }
 
-    private static String getPiece(PrintStream out, int boardRow, int boardCol) {
+    private static String getPiece(int boardRow, int boardCol) {
         ChessPosition position = new ChessPosition(boardRow, boardCol);
 
         if (board.getPiece(position) == null) {

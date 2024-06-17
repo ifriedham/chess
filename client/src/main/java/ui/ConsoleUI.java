@@ -120,7 +120,7 @@ public class ConsoleUI {
             if (numberedList != null && numberedList.containsKey(gameNum)) {
                 GameData listedGame = numberedList.get(gameNum);
                 ChessGame game = listedGame.game();
-                new BoardUI(game.getBoard()).printBoards(out);
+                new BoardUI(out, game).printBoards();
             }
         }catch (Exception e) {
             out.println(e.getMessage());
