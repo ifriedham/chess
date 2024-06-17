@@ -112,17 +112,17 @@ public class ConsoleUI {
 
     private void observe(PrintStream out, Scanner scanner) {
         out.print("Enter the ID of the game you'd like to observe: ");
-        int gameID = scanner.nextInt();
-
-        // check if the given number is from the listgames function
-        if (numberedList != null && numberedList.containsKey(gameID)) {
-            GameData game = numberedList.get(gameID);
-            gameID = game.gameID();
-        }
+        int gameNum = scanner.nextInt();
+        scanner.nextLine(); // consume the newline (don't understand why this is needed now lol)
 
         try {
-            BoardUI.printBoard(out);
-        } catch (Exception e) {
+            // check if the given number is from the listgames function
+            if (numberedList != null && numberedList.containsKey(gameNum)) {
+                GameData listedGame = numberedList.get(gameNum);
+                ChessGame game = listedGame.game();
+                new BoardUI(game.getBoard()).printBoards(out);
+            }
+        }catch (Exception e) {
             out.println(e.getMessage());
         }
     }
@@ -239,6 +239,6 @@ public class ConsoleUI {
 
 
     private void inGame(PrintStream out, Scanner scanner, String team, int gameID) {
-        BoardUI.printBoard(out);
+
     }
 }
