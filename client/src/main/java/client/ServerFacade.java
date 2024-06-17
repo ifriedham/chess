@@ -220,7 +220,7 @@ public class ServerFacade {
     }
 
 
-    public void makeMove(String startPos, String endPos) {
+    public void makeMove(ChessMove move) {
 
     }
 
@@ -228,7 +228,7 @@ public class ServerFacade {
 
     }
 
-    public collection<ChessMove> getValidMoves(ChessPosition pos){
+    public Collection<ChessMove> getValidMoves(ChessPosition pos){
         return null;
     }
 }
