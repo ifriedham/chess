@@ -91,6 +91,7 @@ public class ConsoleUI {
                 help(out);
                 break;
             case "quit":
+                break;
             case "exit":
                 break;
             default:
@@ -154,7 +155,8 @@ public class ConsoleUI {
         try {
             facade.joinGame(auth.authToken(), team, gameID);
             out.println("Joined game ["+ gameID + "] as the " + team + " player");
-            BoardUI.printBoard(out);
+            inGame(out, scanner,team, gameID);
+            //BoardUI.printBoard(out);
         } catch (Exception e) {
             out.println(e.getMessage());
         }
@@ -233,5 +235,10 @@ public class ConsoleUI {
         }
         out.println(SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE + "help" + RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR + " - to display this help menu");
         out.println(SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE + "quit" + RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR + " - to exit this program");
+    }
+
+
+    private void inGame(PrintStream out, Scanner scanner, String team, int gameID) {
+        BoardUI.printBoard(out);
     }
 }
