@@ -8,37 +8,42 @@ import static ui.EscapeSequences.*;
 public class BoardUI {
     private static final int DRAWING_SIZE_IN_SQUARES = 10;
     private static final int BOARD_SIZE_IN_SQUARES = 8;
+
+    private static ChessGame game;
     private static ChessBoard board;
-    private static PrintStream out = null;
+    private static PrintStream out;
+    private static ChessGame.TeamColor team;
 
     public BoardUI(PrintStream outStream, ChessGame givenGame) {
-        board = givenGame.getBoard();
+        game = givenGame;
+        board = game.getBoard();
         out = outStream;
     }
 
+    public void printBoard() { // print board for current team
+        team = game.getTeamTurn();
+        printBoard(game.getTeamTurn());
+    }
 
-    public void printBoards() {
-        drawBoard("BLACK");
+    public void printBoard(ChessGame.TeamColor givenTeam) { // if given a specific team, print that board instead
+        team = givenTeam;
+
         out.println();
-        drawBoard("WHITE");
-    }
-
-    private static void drawBoard(String team) {
-        drawHeader(team);
-        drawRows(team);
-        drawHeader(team);
+        drawHeader();
+        drawRows();
+        drawHeader();
     }
 
 
-    private static void drawHeader(String team) {
+    private static void drawHeader() {
         String headerLine = "";
         out.print(SET_BG_COLOR_LIGHT_GREY);
         out.print(SET_TEXT_COLOR_BLACK);
 
         headerLine = switch (team) {
-            case "WHITE" -> "    A   B  C   D   E  F   G   H    ";
+            case WHITE -> "    A   B  C   D   E  F   G   H    ";
 
-            case "BLACK" -> "    H   G  F   E   D  C   B   A    ";
+            case BLACK -> "    H   G  F   E   D  C   B   A    ";
             default -> headerLine;
         };
 
@@ -47,9 +52,9 @@ public class BoardUI {
         out.println(RESET_BG_COLOR);
     }
 
-    private static void drawRows(String team) {
+    private static void drawRows() {
         switch (team) {
-            case "WHITE":
+            case WHITE:
                 for (int row = BOARD_SIZE_IN_SQUARES; row >= 1; row--) {
                     for (int col = 0; col < DRAWING_SIZE_IN_SQUARES; col++) {
                         printRow(row, col);
@@ -58,7 +63,7 @@ public class BoardUI {
                 }
                 break;
 
-            case "BLACK":
+            case BLACK:
                 for (int row = 1; row <= BOARD_SIZE_IN_SQUARES; row++) {
 
 

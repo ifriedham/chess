@@ -20,6 +20,8 @@ public class ConsoleUI {
     boolean loggedIn;
     private AuthData auth;
     private Map<Integer, GameData> numberedList;
+    PrintStream out;
+    Scanner scanner;
 
     public ConsoleUI(ServerFacade facade) {
         this.facade = facade;
@@ -28,11 +30,10 @@ public class ConsoleUI {
         numberedList = new HashMap<>();
     }
 
-
     public void run() {
-        var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
+        out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         String input = "";
-        Scanner scanner = new Scanner(System.in);
+        scanner = new Scanner(System.in);
 
         out.print(ERASE_SCREEN);
         out.println("♕ Welcome to 240 chess. Type 'help' to get started. ♕");
@@ -41,27 +42,27 @@ public class ConsoleUI {
             if (!(loggedIn)) {
                 out.print("[LOGGED_OUT] >>> ");
                 input = scanner.nextLine();
-                preLogin(out, scanner,  input);
+                preLogin(input);
             } else {
                 out.print("[LOGGED_IN] >>> ");
                 input = scanner.nextLine();
-                postLogin(out, scanner, input);
+                postLogin(input);
             }
         }
         out.println("Hope you had fun, bye!");
     }
 
 
-    public void preLogin(PrintStream out, Scanner scanner, String input) {
+    public void preLogin(String input) {
         switch (input) {
             case "register":
-                register(out, scanner);
+                register();
                 break;
             case "login":
-                login(out, scanner);
+                login();
                 break;
             case "help":
-                help(out);
+                help();
                 break;
             case "quit":
                 break;
@@ -70,25 +71,25 @@ public class ConsoleUI {
         }
     }
 
-    private void postLogin(PrintStream out, Scanner scanner, String input) {
+    private void postLogin(String input) {
         switch (input) {
             case "create":
-                create(out, scanner);
+                create();
                 break;
             case "list":
-                list(out, scanner);
+                list();
                 break;
             case "play":
-                play(out, scanner);
+                play();
                 break;
             case "observe":
-                observe(out, scanner);
+                observe();
                 break;
             case "logout":
-                logout(out, scanner);
+                logout();
                 break;
             case "help":
-                help(out);
+                help();
                 break;
             case "quit":
                 break;
@@ -100,7 +101,7 @@ public class ConsoleUI {
     }
 
 
-    private void logout(PrintStream out, Scanner scanner) {
+    private void logout() {
         try {
             facade.logout(auth.authToken());
             out.println("Successfully logged out.");
@@ -110,59 +111,58 @@ public class ConsoleUI {
         }
     }
 
-    private void observe(PrintStream out, Scanner scanner) {
-        out.print("Enter the ID of the game you'd like to observe: ");
-        int gameNum = scanner.nextInt();
-        scanner.nextLine(); // consume the newline (don't understand why this is needed now lol)
+    private void observe() {
+        out.print("Enter the number of the game you'd like to observe: ");
+        String input = scanner.nextLine();
 
-        try {
-            // check if the given number is from the listgames function
-            if (numberedList != null && numberedList.containsKey(gameNum)) {
-                GameData listedGame = numberedList.get(gameNum);
-                ChessGame game = listedGame.game();
-                new BoardUI(out, game).printBoards();
-            }
-        }catch (Exception e) {
-            out.println(e.getMessage());
+        if (isInList(input)) {
+            int gameNum = Integer.parseInt(input);
+            GameData listedGame = numberedList.get(gameNum);
+            ChessGame game = listedGame.game();
+
+            // print out boards
+            new BoardUI(out, game).printBoard();
         }
     }
 
-    private void play(PrintStream out, Scanner scanner) {
+    private void play() {
         out.print("Enter either the number of the game you'd like to join: ");
         String input = scanner.nextLine();
 
-        int num = Integer.parseInt(input);
-        try {
-            num = Integer.parseInt(input);
-        } catch (NumberFormatException e) {
-            out.println("Invalid game ID or Number.");
-            return;
-        }
+        if (isInList(input)) {
+            // get game ID from list
+            int gameNum = Integer.parseInt(input);
+            GameData listedGame = numberedList.get(gameNum);
+            int gameID = listedGame.gameID();
+            ChessGame game = listedGame.game();
+
+            // get desired team
+            out.print("Please enter your desired team (WHITE or BLACK): ");
+            String givenTeam = scanner.nextLine();
+            String team = givenTeam.toUpperCase(); // in case they give a lowercase team
+            // check if input is valid
+            if (!team.equals("WHITE") && !team.equals("BLACK")) {
+                out.println("Invalid team. Please enter either 'WHITE' or 'BLACK'.");
+                return;
+            }
+
+            // join game
+            try {
+                facade.joinGame(auth.authToken(), team, gameID);
+                out.println("Joined game ["+ gameID + "] as the " + team + " player");
+
+                // proceed to Gameplay menu
+                new GameplayUI(scanner, out, game);
 
 
-        int gameID = num;
-
-        out.print("Please enter your desired team (WHITE or BLACK): ");
-        String givenTeam = scanner.nextLine();
-        String team = givenTeam.toUpperCase(); // in case they give a lowercase team
-
-        // check if the given number is from the listgames function
-        if (numberedList != null && numberedList.containsKey(num)) {
-            GameData game = numberedList.get(num);
-            gameID = game.gameID();
-        }
-
-        try {
-            facade.joinGame(auth.authToken(), team, gameID);
-            out.println("Joined game ["+ gameID + "] as the " + team + " player");
-            inGame(out, scanner,team, gameID);
-            //BoardUI.printBoard(out);
-        } catch (Exception e) {
-            out.println(e.getMessage());
+                new BoardUI(out, game).printBoard();
+            } catch (Exception e) {
+                out.println("Failed to join game");
+            }
         }
     }
 
-    private void list(PrintStream out, Scanner scanner) {
+    private void list() {
         try {
             var gamesList = facade.listGames(auth.authToken());
             int i = 1;
@@ -178,7 +178,7 @@ public class ConsoleUI {
         }
     }
 
-    private void create(PrintStream out, Scanner scanner) {
+    private void create() {
         out.print("Enter a new game name: ");
         String gameName = scanner.nextLine();
         try {
@@ -189,7 +189,7 @@ public class ConsoleUI {
         }
     }
 
-    public void register (PrintStream out, Scanner scanner){
+    public void register (){
         out.print("Enter new username: ");
         String username = scanner.nextLine();
         out.print("Enter new password: ");
@@ -206,7 +206,7 @@ public class ConsoleUI {
         }
     }
 
-    public void login (PrintStream out, Scanner scanner){
+    public void login (){
         out.print("Enter username: ");
         String username = scanner.nextLine();
         out.print("Enter password: ");
@@ -221,7 +221,7 @@ public class ConsoleUI {
         }
     }
 
-    public void help(PrintStream out) {
+    public void help() {
         if (loggedIn) {
             out.println(SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE + "create" + RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR + " - make a new game");
             out.println(SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE + "list" + RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR + " - get a list of games");
@@ -237,8 +237,21 @@ public class ConsoleUI {
         out.println(SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE + "quit" + RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR + " - to exit this program");
     }
 
+    private boolean isInList(String input) {
+        int gameNum = 0;
+        // check valid input
+        try {
+            gameNum = Integer.parseInt(input);
+        } catch (NumberFormatException e) {
+            out.println("Invalid input. Please enter a number.");
+            return false;
+        }
 
-    private void inGame(PrintStream out, Scanner scanner, String team, int gameID) {
-
+        if (numberedList == null || !numberedList.containsKey(gameNum)) {
+            out.println("That game doesn't exist. Please enter a valid number (use 'list' to see available games).");
+            return false;
+        }
+        return true;
     }
+
 }
