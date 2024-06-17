@@ -3,7 +3,7 @@ package WebSocket;
 import chess.ChessBoard;
 import chess.ChessGame;
 import com.google.gson.Gson;
-import websocket.messages.*;
+import websocket.messages.ServerMessage;
 
 import javax.websocket.*;
 import java.net.URI;
@@ -41,8 +41,7 @@ public class WSClient extends Endpoint {
                         case NOTIFICATION:
                             this.notify(message);
                     }
-                } catch(Exception ex) {
-//          observer.notify(new ErrorMessage(ex.getMessage()));
+                } catch(Exception e) {
                 }
             }
 
