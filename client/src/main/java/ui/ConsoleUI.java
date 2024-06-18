@@ -179,7 +179,7 @@ public class ConsoleUI {
         try {
             Collection<ChessMove> moves = facade.getValidMoves(pos);
             Collection<ChessPosition> endPositions = moves.stream().map(ChessMove::getEndPosition).toList();
-            new BoardUI(out, game).printValidMoves(endPositions, pos, playerColor);
+            //new BoardUI(out, game).printValidMoves(endPositions, pos, playerColor);
         } catch (Exception e) {
             out.println("Invalid move.");
         }
