@@ -2,6 +2,7 @@ package server;
 
 import com.google.gson.Gson;
 import model.*;
+import server.websocket.WSServer;
 import service.*;
 import spark.*;
 import dataaccess.*;
@@ -9,6 +10,8 @@ import dataaccess.*;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Map;
+
+import static spark.Spark.webSocket;
 
 public class Server {
     private final UserService userService = new UserService();
@@ -24,6 +27,8 @@ public class Server {
         Spark.port(desiredPort);
 
         Spark.staticFiles.location("web");
+
+        webSocket("/ws", WSServer.class);
 
         // Initialize the database
         try {

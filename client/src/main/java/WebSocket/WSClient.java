@@ -3,25 +3,19 @@ package WebSocket;
 import chess.ChessBoard;
 import chess.ChessGame;
 import com.google.gson.Gson;
+import websocket.messages.Notification;
+import websocket.messages.Error;
 import websocket.messages.ServerMessage;
+import websocket.messages.LoadGame;
 
 import javax.websocket.*;
 import java.net.URI;
-import java.util.Scanner;
 
 public class WSClient extends Endpoint {
 
-    public static void main(String[] args) throws Exception {
-        Scanner scanner = new Scanner(System.in);
-    }
-
     public Session session;
-    private ChessBoard board;
-    private ChessGame game;
 
     public WSClient(String url, ChessBoard chessBoard) throws Exception {
-        board = chessBoard;
-
         url = url.replace("http", "ws") + "connect";
         URI uri = new URI(url);
         WebSocketContainer container = ContainerProvider.getWebSocketContainer();
@@ -42,30 +36,27 @@ public class WSClient extends Endpoint {
                             this.notify(message);
                     }
                 } catch(Exception e) {
+                    System.out.println("Error: " + e.getMessage());
                 }
             }
 
             private void notify(String message) {
-                NotificationResponse notification = new Gson().fromJson(message, NotificationResponse.class);
-                chessBoard.notify(notification.message());
+                Notification notification = new Gson().fromJson(message, Notification.class);
+                chessBoard.notify();
             }
 
         });
     }
 
     private void loadGame(String message) {
-        LoadGameResponse loadGameResponse = new Gson().fromJson(message, LoadGameResponse.class);
-        game = loadGameResponse.game();
-        board.setGame(game);
+        LoadGame loadGameResponse = new Gson().fromJson(message, LoadGame.class);
+        ChessGame game = loadGameResponse.game();
+        game.setBoard(game.getBoard());
     }
 
     private void error(String message) {
-        ErrorResponse errorResponse = new Gson().fromJson(message, ErrorResponse.class);
+        Error errorResponse = new Gson().fromJson(message, Error.class);
         System.out.println("Error: " + errorResponse.message());
-    }
-
-    public void send(String msg) throws Exception {
-        this.session.getBasicRemote().sendText(msg);
     }
 
     @Override
