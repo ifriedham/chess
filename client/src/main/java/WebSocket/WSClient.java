@@ -1,4 +1,4 @@
-package WebSocket;
+package websocket;
 
 import chess.ChessBoard;
 import chess.ChessGame;
@@ -16,7 +16,7 @@ public class WSClient extends Endpoint {
     public Session session;
 
     public WSClient(String url, ChessBoard chessBoard) throws Exception {
-        url = url.replace("http", "ws") + "connect";
+        url = url.replace("http", "ws") + "/connect";
         URI uri = new URI(url);
         WebSocketContainer container = ContainerProvider.getWebSocketContainer();
         this.session = container.connectToServer(this, uri);

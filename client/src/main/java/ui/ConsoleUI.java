@@ -49,12 +49,12 @@ public class ConsoleUI {
             if (!(loggedIn)) {
                 out.print("[LOGGED_OUT] >>> ");
                 input = scanner.nextLine();
-                if (inGame) inGame(input);
-                else preLogin(input);
+                preLogin(input);
             } else {
                 out.print("[LOGGED_IN] >>> ");
                 input = scanner.nextLine();
-                postLogin(input);
+                if (inGame) inGame(input);
+                else postLogin(input);
             }
         }
         out.println("Hope you had fun, bye!");
@@ -128,7 +128,7 @@ public class ConsoleUI {
                 inGame = false;
                 break;
             default:
-                out.println("Invalid command. Type 'help' for a list of commands.");
+                out.println("Invalid command. Type 'help' for a list of commands. //INGAME");
         }
     }
 
@@ -260,7 +260,7 @@ public class ConsoleUI {
 
                 // proceed to inGame ui
                 game = listedGame.game();
-                inGame = true;
+                this.inGame = true;
 
                 if (team.equals("WHITE")){
                     playerColor = ChessGame.TeamColor.WHITE;
